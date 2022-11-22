@@ -1,3 +1,13 @@
+/**
+ * Class for drawing the window, game board, and everything else for each window.
+ * Also handles some logic.
+ *
+ * @Project Ultimate Reversi
+ * @Author Medusa Dempsey
+ * @Version 1.0
+ * @since 1.0
+ */
+
 package org.example;
 
 import java.awt.BorderLayout;
@@ -12,16 +22,33 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class View {
-
+    /**
+     * Array containing all spaces on the board, as drawn from this view.
+     */
     private GridButton[][] arrayButt = new GridButton[8][8];
+    /**
+     * JFrame containing the view.
+     */
     private JFrame guiFrame = new JFrame();
+    /**
+     * Boolean representing the colour of this view's player - true if black, false if white.
+     */
     private boolean isBlack;
+    /**
+     * Boolean set to true if the current turn is this view's turn.
+     */
     private boolean isTurn;
+    /**
+     * Title of the screen of this view.
+     */
     private JLabel screenTitle;
 
-    public StringBuffer title;
-
-    // constructor takes parent model and boolean for if the view is reversed or not
+    /**
+     * Constructor method.
+     *
+     * @param isBlack sets member variable isBlack
+     * @since 1.0
+     */
     public View(boolean isBlack) {
         Model.get().storeView(this);
         this.isBlack = isBlack;
@@ -37,6 +64,11 @@ public class View {
         }
     }
 
+    /**
+     * Method for creating the GUI of this view.
+     *
+     * @since 1.0
+     */
     // method for creating the GUI
     public void createGUI() {
         guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,6 +164,11 @@ public class View {
 
     }
 
+    /**
+     * Update method. Called every time a piece is played, for both views.
+     *
+     * @since 1.0
+     */
     // called every time a piece is played, for both views
     public void update() {
         String newTitle;
