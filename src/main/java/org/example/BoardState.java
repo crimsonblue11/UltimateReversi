@@ -1,10 +1,8 @@
 /**
  * Class to handle the state of the game board.
  *
- * @Project Ultimate Reversi
- * @Author Medusa Dempsey
- * @Version 1.0
- * @since 1.0
+ * @author Medusa Dempsey
+ * @version 1.0
  */
 package org.example;
 
@@ -13,7 +11,7 @@ public class BoardState {
      * 2D array representing each square of the board.
      * This is an array of fixed size, so that the board size doesn't change at runtime.
      */
-    private int[][] boardArray = new int[8][8];
+    private final int[][] boardArray = new int[8][8];
     /**
      * Integer to keep track of black player's score.
      */
@@ -22,9 +20,6 @@ public class BoardState {
      * Integer to keep track of white player's score.
      */
     private int whiteScore = 0;
-
-    // 1 represents black, 2 represents white, 0 represents empty
-    // no need to instantiate any values since 0 (empty) by default
 
     /**
      * Constructor method to place initial counters on the board.
@@ -35,10 +30,7 @@ public class BoardState {
         boardArray[3][4] = 1;
         boardArray[4][3] = 1;
         boardArray[4][4] = 2;
-        // access array as [row][col]
     }
-
-    // method for capturing counters
 
     /**
      * Method containing the logic for capturing a counter.
@@ -48,7 +40,6 @@ public class BoardState {
      * @param row     The row of the counter that has been placed.
      * @param col     The column of the counter that has been placed.
      * @param isBlack Boolean representing the colour of the placed piece - true if black, false if white.
-     * @since 1.0
      */
     public void captureCounters(int row, int col, boolean isBlack) {
         // access spaces in reverse if black view, since upside-down
@@ -70,7 +61,8 @@ public class BoardState {
                 int colpos = col + coloffset;
 
                 int curr = getState(rowpos, colpos);
-                if (curr == -1 || curr == 0 || curr == boardArray[row][col]) { // invalid, empty, or the same colour
+                if (curr == -1 || curr == 0 || curr == boardArray[row][col]) {
+                    // invalid, empty, or the same colour
                     continue;
                 }
 
@@ -84,7 +76,8 @@ public class BoardState {
                     count++;
                 }
 
-                if (curr == boardArray[row][col]) { // same colour found, capture everything inbetween
+                if (curr == boardArray[row][col]) {
+                    // same colour found, capture everything inbetween
                     for (int i = 0; i < count; i++) {
                         boardArray[row + (i * rowoffset)][col + (i * coloffset)] = boardArray[row][col];
                     }
@@ -93,8 +86,6 @@ public class BoardState {
             }
         }
     }
-
-    // method to count how many pieces a space can capture if played
 
     /**
      * Method to count how many pieces can be captured if a space is played.
@@ -127,8 +118,7 @@ public class BoardState {
         int finalCount = 0; // variable to keep track of how many pieces will be captured if played
         for (int rowoffset = -1; rowoffset <= 1; rowoffset++) {
             for (int coloffset = -1; coloffset <= 1; coloffset++) {
-                // double zero offset is no offset
-                // it is just the input space, hence ignore
+                // double zero offset = no offset, hence ignore
                 if (rowoffset == 0 && coloffset == 0) {
                     continue;
                 }
@@ -218,7 +208,6 @@ public class BoardState {
      * @param row Row of the queried space.
      * @param col Column of the queried space.
      * @return Value of the queried space.
-     * @since 1.0
      */
     public int getState(int row, int col) {
         if (row > 7 || col > 7 || row < 0 || col < 0) {
@@ -233,11 +222,9 @@ public class BoardState {
      * Accessor method for scores.
      *
      * @return An array of integers containing white score and black score.
-     * @since 1.0
      */
     public int[] getScore() {
-        int[] scoreArr = {whiteScore, blackScore};
-        return scoreArr;
+        return new int[]{whiteScore, blackScore};
     }
 
     // SETTERS
@@ -250,7 +237,6 @@ public class BoardState {
      * @param row     Row of the space to change.
      * @param col     Column of the space to change.
      * @param isBlack Boolean representing the colour to change the space to - true if black, false if white.
-     * @since 1.0
      */
     public void setState(int row, int col, boolean isBlack) {
         // access black in reverse since upside-down

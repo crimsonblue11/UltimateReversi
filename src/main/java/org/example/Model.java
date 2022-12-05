@@ -2,10 +2,8 @@
  * Class for the many variables relating to the board.
  * Also, this class is a singleton.
  *
- * @Project Ultimate Reversi
- * @Author Medusa Dempsey
- * @Version 1.0
- * @since 1.0
+ * @author Medusa Dempsey
+ * @version 1.0
  */
 package org.example;
 
@@ -29,8 +27,6 @@ public class Model {
 
     /**
      * Private constructor. Prevents external methods instantiating this class.
-     *
-     * @since 1.0
      */
     private Model() {
     }
@@ -39,7 +35,6 @@ public class Model {
      * Accessor method for static instance.
      *
      * @return Static instance.
-     * @since 1.0
      */
     public static Model get() {
         return model;
@@ -49,7 +44,6 @@ public class Model {
      * Method for adding a view to the list of views to update.
      *
      * @param view View to add to the list of views.
-     * @since 1.0
      */
     public void storeView(View view) {
         listOfViews.add(view);
@@ -57,8 +51,6 @@ public class Model {
 
     /**
      * Method to update all views in the list of views.
-     *
-     * @since 1.0
      */
     public void updateAllViews() {
         for (View listOfView : listOfViews) {

@@ -2,10 +2,8 @@
  * Class for drawing the window, game board, and everything else for each window.
  * Also handles some logic.
  *
- * @Project Ultimate Reversi
- * @Author Medusa Dempsey
- * @Version 1.0
- * @since 1.0
+ * @author Medusa Dempsey
+ * @version 1.0
  */
 
 package org.example;
@@ -25,15 +23,15 @@ public class View {
     /**
      * Array containing all spaces on the board, as drawn from this view.
      */
-    private GridButton[][] arrayButt = new GridButton[8][8];
+    private final GridButton[][] arrayButt = new GridButton[8][8];
     /**
      * JFrame containing the view.
      */
-    private JFrame guiFrame = new JFrame();
+    private final JFrame guiFrame = new JFrame();
     /**
      * Boolean representing the colour of this view's player - true if black, false if white.
      */
-    private boolean isBlack;
+    private final boolean isBlack;
     /**
      * Boolean set to true if the current turn is this view's turn.
      */
@@ -47,7 +45,6 @@ public class View {
      * Constructor method.
      *
      * @param isBlack sets member variable isBlack
-     * @since 1.0
      */
     public View(boolean isBlack) {
         Model.get().storeView(this);
@@ -57,29 +54,20 @@ public class View {
         // the requirements state white must go first, hence when initialised the roles
         // must be switched
         guiFrame.setTitle("Reversi");
-        if (isBlack) {
-            isTurn = true;
-        } else {
-            isTurn = false;
-        }
+        isTurn = isBlack;
     }
 
     /**
      * Method for creating the GUI of this view.
-     *
-     * @since 1.0
      */
-    // method for creating the GUI
     public void createGUI() {
         guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         guiFrame.setLayout(new BorderLayout());
-        guiFrame.setPreferredSize(new Dimension(600, 700)); // this is a good size
+        guiFrame.setPreferredSize(new Dimension(600, 700));
 
-        // panel for the 8x8 grid of spaces
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(8, 8));
 
-        // loop through each arrayButt index and instantiate them
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 // need to access black in reverse since view is upside down
@@ -96,11 +84,9 @@ public class View {
                         int row = b.getRow();
                         int col = b.getCol();
 
-                        // no need to handle different inputs since the method does that for us
                         Model.get().bState.setState(row, col, isBlack);
                         Model.get().bState.captureCounters(row, col, isBlack);
 
-                        // update both views so they're kept consistent
                         Model.get().updateAllViews();
                     }
                 });
@@ -109,19 +95,19 @@ public class View {
             }
         }
 
-        // code for greedy ai button
-        // no need to subclass jbutton, this is a normal button
+        // code for greedy AI button
         JButton button = new JButton("Make greedy AI move");
         button.setFont(new Font("Ariel", Font.BOLD, 20));
 
-        // implementing functionality with lambda expression
         button.addActionListener((e) -> {
             if (isTurn) {
                 GridButton highest = arrayButt[0][0];
 
                 // algorithm will find the highest value on the board
                 // and ignore subsequent spaces of equal value
-                // hence the first occurence of the highest value will always be played
+                // hence the first occurrence of the highest value will always be played
+
+                // todo : what fuck
                 for (int i = 0; i < 8; i++) {
                     for (int j = 0; j < 8; j++) {
                         int curr;
@@ -132,12 +118,9 @@ public class View {
                     }
                 }
 
-                // playing the piece, this is almost identical to the code
-                // for manually playing a piece
                 int row = highest.getRow();
                 int col = highest.getCol();
 
-                // no need to differentiate parameters since methods handle that
                 Model.get().bState.setState(row, col, isBlack);
                 Model.get().bState.captureCounters(row, col, isBlack);
 
@@ -151,7 +134,6 @@ public class View {
             screenTitle = new JLabel("White player");
         }
 
-        // add everything to the jframe
         guiFrame.add(panel, BorderLayout.CENTER);
         guiFrame.add(button, BorderLayout.SOUTH);
         guiFrame.add(screenTitle, BorderLayout.NORTH);
@@ -159,17 +141,13 @@ public class View {
         guiFrame.pack();
         guiFrame.setVisible(true);
 
-        // initial update to make sure everything is enabled correctly
         update();
-
     }
 
     /**
      * Update method. Called every time a piece is played, for both views.
      *
-     * @since 1.0
      */
-    // called every time a piece is played, for both views
     public void update() {
         String newTitle;
         if (isTurn) {
@@ -182,7 +160,6 @@ public class View {
             screenTitle.setText(newTitle);
         }
 
-        // loop through the entire button array
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 // code for updating button array states depending on external state array
@@ -196,21 +173,15 @@ public class View {
                 // code for enabling/disabling buttons
                 // a button will be enabled if it is the current view's turn, and
                 // the space will capture at least 1 opposing piece
-                if (isTurn && Model.get().bState.countCapture(i, j, isBlack) > 0) {
-                    arrayButt[i][j].setEnabled(true);
-                } else {
-                    // if neither of these cases are fulfiled, the button is disabled
-                    // i.e. the space is not playable
-                    arrayButt[i][j].setEnabled(false);
-                }
+                // if neither of these cases are fulfiled, the button is disabled
+                // i.e. the space is not playable
+                arrayButt[i][j].setEnabled(isTurn && Model.get().bState.countCapture(i, j, isBlack) > 0);
             }
         }
 
-        // repaint the guiframe to reflect the changes
         guiFrame.repaint();
 
         // game will end if the entire board is full, or both players are in a stalemate
-        // i.e. neither player can place a single piece
         if (Model.get().bState.isGameOver()) {
             String outDialog;
             int[] scores = Model.get().bState.getScore();
