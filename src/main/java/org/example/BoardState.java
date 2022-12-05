@@ -11,25 +11,64 @@ public class BoardState {
      * 2D array representing each square of the board.
      * This is an array of fixed size, so that the board size doesn't change at runtime.
      */
-    private final int[][] boardArray = new int[8][8];
+    private final int[][] m_BoardArray = new int[8][8];
     /**
      * Integer to keep track of black player's score.
      */
-    private int blackScore = 0;
+    private int m_BlackStore = 0;
     /**
      * Integer to keep track of white player's score.
      */
-    private int whiteScore = 0;
+    private int m_WhiteScore = 0;
+
+    /**
+     * Accessor method for the state of a given space.
+     *
+     * @param row Row of the queried space.
+     * @param col Column of the queried space.
+     * @return Value of the queried space.
+     */
+    public int GetState(int row, int col) {
+        if (row > 7 || col > 7 || row < 0 || col < 0) {
+            return -1;
+        }
+        return m_BoardArray[row][col];
+    }
+
+    /**
+     * Accessor method for scores.
+     *
+     * @return An array of integers containing white score and black score.
+     */
+    public int[] GetScore() {
+        return new int[]{m_WhiteScore, m_BlackStore};
+    }
+
+    /**
+     * Mutator method for individual board spaces.
+     *
+     * @param row     Row of the space to change.
+     * @param col     Column of the space to change.
+     * @param isBlack Boolean representing the colour to change the space to - true if black, false if white.
+     */
+    public void SetState(int row, int col, boolean isBlack) {
+        if (isBlack) {
+            m_BoardArray[7 - row][7 - col] = 1;
+        } else {
+            m_BoardArray[row][col] = 2;
+        }
+
+    }
 
     /**
      * Constructor method to place initial counters on the board.
      */
     public BoardState() {
         // hardcode the counters that start on the board
-        boardArray[3][3] = 2;
-        boardArray[3][4] = 1;
-        boardArray[4][3] = 1;
-        boardArray[4][4] = 2;
+        m_BoardArray[3][3] = 2;
+        m_BoardArray[3][4] = 1;
+        m_BoardArray[4][3] = 1;
+        m_BoardArray[4][4] = 2;
     }
 
     /**
@@ -41,7 +80,7 @@ public class BoardState {
      * @param col     The column of the counter that has been placed.
      * @param isBlack Boolean representing the colour of the placed piece - true if black, false if white.
      */
-    public void captureCounters(int row, int col, boolean isBlack) {
+    public void CaptureCounters(int row, int col, boolean isBlack) {
         // access spaces in reverse if black view, since upside-down
         if (isBlack) {
             row = 7 - row;
@@ -60,14 +99,14 @@ public class BoardState {
                 int rowpos = row + rowoffset;
                 int colpos = col + coloffset;
 
-                int curr = getState(rowpos, colpos);
-                if (curr == -1 || curr == 0 || curr == boardArray[row][col]) {
+                int curr = GetState(rowpos, colpos);
+                if (curr == -1 || curr == 0 || curr == m_BoardArray[row][col]) {
                     // invalid, empty, or the same colour
                     continue;
                 }
 
-                while (curr != 0 && curr != boardArray[row][col]) {
-                    curr = getState(rowpos += rowoffset, colpos += coloffset);
+                while (curr != 0 && curr != m_BoardArray[row][col]) {
+                    curr = GetState(rowpos += rowoffset, colpos += coloffset);
 
                     if (curr == -1) {
                         break;
@@ -76,10 +115,10 @@ public class BoardState {
                     count++;
                 }
 
-                if (curr == boardArray[row][col]) {
+                if (curr == m_BoardArray[row][col]) {
                     // same colour found, capture everything inbetween
                     for (int i = 0; i < count; i++) {
-                        boardArray[row + (i * rowoffset)][col + (i * coloffset)] = boardArray[row][col];
+                        m_BoardArray[row + (i * rowoffset)][col + (i * coloffset)] = m_BoardArray[row][col];
                     }
                 }
 
@@ -96,7 +135,7 @@ public class BoardState {
      * @return Number of spaces that can be captured if the input move is played.
      * @since 1.0
      */
-    public int countCapture(int row, int col, final boolean isBlack) {
+    public int CountCapture(int row, int col, final boolean isBlack) {
         // this avoids having to put differing inputs in for different views
         // black view's inputs are reversed since the view is upside-down
         int counter;
@@ -109,7 +148,7 @@ public class BoardState {
         }
 
         // return null for spaces that aren't empty or out of bounds
-        if (getState(row, col) > 0 || getState(row, col) == -1) {
+        if (GetState(row, col) > 0 || GetState(row, col) == -1) {
             return 0;
         }
 
@@ -127,11 +166,11 @@ public class BoardState {
                 int colpos = col + coloffset;
 
                 // if out of bounds, skip over it
-                if (getState(rowpos, colpos) == -1) {
+                if (GetState(rowpos, colpos) == -1) {
                     continue;
                 }
 
-                int curr = boardArray[rowpos][colpos]; // variable to keep track of the counter that's being examined
+                int curr = m_BoardArray[rowpos][colpos]; // variable to keep track of the counter that's being examined
                 int count = 0; // variable to keep track of how many have been checked
 
                 // if the current counter is empty or the same colour, skip to the next
@@ -143,7 +182,7 @@ public class BoardState {
                 // keep going in the same direction if the curr is of the opposite colour
                 // i.e. not empty, not the same colour
                 while (curr > 0 && curr != counter) {
-                    curr = getState(rowpos += rowoffset, colpos += coloffset);
+                    curr = GetState(rowpos += rowoffset, colpos += coloffset);
                     if (curr == -1) {
                         break;
                     }
@@ -161,36 +200,34 @@ public class BoardState {
         return finalCount;
     }
 
-    // method for checking if the game is over (returns true if it is)
-
     /**
      * Method for checking if it is still possible to make moves (i.e. if the game is over or not).
      *
      * @return True if the game is over, false if not.
      * @since 1.0
      */
-    public boolean isGameOver() {
+    public boolean CheckGameOver() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 int curr = 0;
 
                 // need to check both views for playable spaces
-                curr += countCapture(i, j, false);
-                curr += countCapture(i, j, true);
+                curr += CountCapture(i, j, false);
+                curr += CountCapture(i, j, true);
 
                 // only makes sense to count pieces when the game is over, so do that here too
-                if (boardArray[i][j] == 1) {
-                    blackScore++;
-                } else if (boardArray[i][j] == 2) {
-                    whiteScore++;
+                if (m_BoardArray[i][j] == 1) {
+                    m_BlackStore++;
+                } else if (m_BoardArray[i][j] == 2) {
+                    m_WhiteScore++;
                 }
 
                 // if either of the current spaces are playable, the game is not over
                 // return false since there is no need to check the others
                 if (curr != 0) {
-                    // game is not over, reset scores so they don't carry over
-                    whiteScore = 0;
-                    blackScore = 0;
+                    // game is not over - scores are reset, so they don't carry over
+                    m_WhiteScore = 0;
+                    m_BlackStore = 0;
 
                     return false;
                 }
@@ -200,51 +237,5 @@ public class BoardState {
         // at this point all places will have been checked
         // none are playable, so the game must be over - return true
         return true;
-    }
-
-    /**
-     * Accessor method for the state of a given space.
-     *
-     * @param row Row of the queried space.
-     * @param col Column of the queried space.
-     * @return Value of the queried space.
-     */
-    public int getState(int row, int col) {
-        if (row > 7 || col > 7 || row < 0 || col < 0) {
-            return -1;
-        }
-        return boardArray[row][col];
-    }
-
-    // getter method for scores
-
-    /**
-     * Accessor method for scores.
-     *
-     * @return An array of integers containing white score and black score.
-     */
-    public int[] getScore() {
-        return new int[]{whiteScore, blackScore};
-    }
-
-    // SETTERS
-
-    // setter method for board state
-
-    /**
-     * Mutator method for individual board spaces.
-     *
-     * @param row     Row of the space to change.
-     * @param col     Column of the space to change.
-     * @param isBlack Boolean representing the colour to change the space to - true if black, false if white.
-     */
-    public void setState(int row, int col, boolean isBlack) {
-        // access black in reverse since upside-down
-        if (isBlack) {
-            boardArray[7 - row][7 - col] = 1;
-        } else {
-            boardArray[row][col] = 2;
-        }
-
     }
 }

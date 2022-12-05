@@ -18,15 +18,51 @@ public class GridButton extends JButton {
      * Integer representing state of the grid space.
      * 1 - black, 2 - white, 0 - empty.
      */
-    private int state;
+    private int m_State;
     /**
      * Member variable representing row of the space.
      */
-    private final int row;
+    private final int m_Row;
     /**
      * Member variable representing column of the space.
      */
-    private final int col;
+    private final int m_Col;
+
+    /**
+     * Accessor method for space state.
+     *
+     * @return State of the space.
+     */
+    public int GetState() {
+        return m_State;
+    }
+
+    /**
+     * Accessor method for the row of a space.
+     *
+     * @return Row of the space.
+     */
+    public int GetRow() {
+        return m_Row;
+    }
+
+    /**
+     * Accessor method for the column of a space.
+     *
+     * @return Column of the space.
+     */
+    public int GetCol() {
+        return m_Col;
+    }
+
+    /**
+     * Mutator method for the state of the space.
+     *
+     * @param inState State to change the space to.
+     */
+    public void SetState(int inState) {
+        m_State = inState;
+    }
 
     /**
      * Constructor.
@@ -37,9 +73,9 @@ public class GridButton extends JButton {
      * @param inState Initial state of the space
      */
     public GridButton(int row, int col, int inState) {
-        state = inState;
-        this.row = row;
-        this.col = col;
+        m_State = inState;
+        m_Row = row;
+        m_Col = col;
         this.setBorder(BorderFactory.createLineBorder(Color.black, 2));
         this.setBackground(Color.green);
     }
@@ -53,13 +89,13 @@ public class GridButton extends JButton {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (state == 2) {
+        if (m_State == 2) {
             // if white, paint a white circle with a black border (oval)
             g.setColor(Color.white);
             g.fillOval(0, 0, getSize().width, getSize().height);
             g.setColor(Color.black);
             g.drawOval(0, 0, getSize().width, getSize().height);
-        } else if (state == 1) {
+        } else if (m_State == 1) {
             // if black, paint a black circle with a white border (oval)
             g.setColor(Color.black);
             g.fillOval(0, 0, getSize().width, getSize().height);
@@ -67,44 +103,5 @@ public class GridButton extends JButton {
             g.drawOval(0, 0, getSize().width, getSize().height);
         }
         // if neither, the square is empty and nothing else needs to be done
-
-    }
-
-    /**
-     * Accessor method for space state.
-     *
-     * @return State of the space.
-     */
-    public int getState() {
-        return state;
-    }
-
-    /**
-     * Accessor method for the row of a space.
-     *
-     * @return Row of the space.
-     */
-    public int getRow() {
-        return row;
-    }
-
-    // getter method for column
-
-    /**
-     * Accessor method for the column of a space.
-     *
-     * @return Column of the space.
-     */
-    public int getCol() {
-        return col;
-    }
-
-    /**
-     * Mutator method for the state of the space.
-     *
-     * @param inState State to change the space to.
-     */
-    public void setState(int inState) {
-        state = inState;
     }
 }

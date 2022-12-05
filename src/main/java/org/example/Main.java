@@ -13,7 +13,7 @@ public class Main {
      * Instantiates two views, one black and one white.
      */
     public static void main(String[] args) {
-        new View(false).createGUI();
-        new View(true).createGUI();
+        new View(false).CreateGUI();
+        new View(true).CreateGUI();
     }
 }
