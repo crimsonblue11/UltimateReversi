@@ -54,20 +54,23 @@ public class Model {
 
     /**
      * Method to update all views in the list of views.
+     * Also checks if the game is over via {@code BoardState.CheckGameOver}.
+     * This is done here to ensure all views are updated accurately before the game ends.
+     *
+     * @see BoardState#CheckGameOver()
      */
     public void UpdateViews() {
         for (View listOfView : m_ViewArray) {
             listOfView.Update();
         }
 
-        if (Model.GetSelf().GetBoardState().CheckGameOver()) {
-            String outDialog;
-            int whiteScore = Model.GetSelf().GetBoardState().GetWhiteScore();
-            int blackScore = Model.GetSelf().GetBoardState().GetBlackScore();
+        if (m_BoardState.CheckGameOver()) {
+            int whiteScore = m_BoardState.GetWhiteScore();
+            int blackScore = m_BoardState.GetBlackScore();
 
             String winner_colour = (whiteScore > blackScore) ? "White" : "Black";
 
-            outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
+            String outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
 
             JOptionPane.showMessageDialog(null, outDialog);
             System.exit(0);

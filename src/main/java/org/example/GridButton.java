@@ -18,7 +18,7 @@ public class GridButton extends JButton {
      * Integer representing state of the grid space.
      * 1 - black, 2 - white, 0 - empty.
      */
-    private int m_State;
+    private SpaceState m_State;
     /**
      * Member variable representing row of the space.
      */
@@ -33,7 +33,7 @@ public class GridButton extends JButton {
      *
      * @return State of the space.
      */
-    public int GetState() {
+    public SpaceState GetState() {
         return m_State;
     }
 
@@ -60,7 +60,7 @@ public class GridButton extends JButton {
      *
      * @param inState State to change the space to.
      */
-    public void SetState(int inState) {
+    public void SetState(SpaceState inState) {
         m_State = inState;
     }
 
@@ -72,30 +72,36 @@ public class GridButton extends JButton {
      * @param col     Column of the space.
      * @param inState Initial state of the space
      */
-    public GridButton(int row, int col, int inState) {
+    public GridButton(int row, int col, SpaceState inState) {
         m_State = inState;
         m_Row = row;
         m_Col = col;
-        this.setBorder(BorderFactory.createLineBorder(Color.black, 2));
-        this.setBackground(Color.green);
+
+        Color backgroundColor = Color.green;
+        setBackground(backgroundColor);
+
+        Color borderColour = Color.black;
+        int borderThickness = 2;
+        setBorder(BorderFactory.createLineBorder(borderColour, borderThickness));
     }
 
     /**
      * Override of paintComponent method.
-     * Used to paint component with (or without) counter inside it.
+     * Used to paint component with counter inside it, if needed. If the space is empty,
+     * then do nothing.
      *
-     * @param g Graphics object to draw the button to
+     * @param g Graphics object to draw the button to.
      */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (m_State == 2) {
+        if (m_State == SpaceState.WHITE) {
             // if white, paint a white circle with a black border (oval)
             g.setColor(Color.white);
             g.fillOval(0, 0, getSize().width, getSize().height);
             g.setColor(Color.black);
             g.drawOval(0, 0, getSize().width, getSize().height);
-        } else if (m_State == 1) {
+        } else if (m_State == SpaceState.BLACK) {
             // if black, paint a black circle with a white border (oval)
             g.setColor(Color.black);
             g.fillOval(0, 0, getSize().width, getSize().height);

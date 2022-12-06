@@ -16,10 +16,10 @@ import java.awt.GridLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class View {
+    private final Model m_Model;
     /**
      * Array containing all spaces on the board, as drawn from this view.
      */
@@ -40,6 +40,8 @@ public class View {
      * Title of the screen of this view.
      */
     private JLabel m_Title;
+    final static int WIN_WIDTH = 600;
+    final static int WIN_HEIGHT = 700;
 
     /**
      * Constructor method.
@@ -47,14 +49,15 @@ public class View {
      * @param isBlack sets member variable isBlack
      */
     public View(boolean isBlack) {
-        Model.GetSelf().StoreView(this);
-        this.IS_BLACK = isBlack;
+        m_Model = Model.GetSelf();
+        m_Model.StoreView(this);
+
+        m_Frame.setTitle("Reversi");
 
         // when update is called, the current turn will switch
-        // the requirements state white must go first, hence when initialised the roles
-        // must be switched
-        m_Frame.setTitle("Reversi");
+        // white goes first, so when initialised the roles must be switched
         IS_TURN = isBlack;
+        IS_BLACK = isBlack;
     }
 
     /**
@@ -63,27 +66,24 @@ public class View {
     public void CreateGUI() {
         m_Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         m_Frame.setLayout(new BorderLayout());
-        m_Frame.setPreferredSize(new Dimension(600, 700));
+        m_Frame.setPreferredSize(new Dimension(WIN_WIDTH, WIN_HEIGHT));
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(8, 8));
+        panel.setLayout(new GridLayout(BoardState.GRID_SIZE, BoardState.GRID_SIZE));
 
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                // need to access black in reverse since view is upside down
-                if (IS_BLACK) {
-                    m_ButtonArray[i][j] = new GridButton(i, j, Model.GetSelf().GetBoardState().GetState(7 - i, 7 - j));
-                } else {
-                    m_ButtonArray[i][j] = new GridButton(i, j, Model.GetSelf().GetBoardState().GetState(i, j));
-                }
+        for (int r_pos = 0; r_pos < BoardState.GRID_SIZE; r_pos++) {
+            for (int c_pos = 0; c_pos < BoardState.GRID_SIZE; c_pos++) {
+                int r = IS_BLACK ? 7 - r_pos : r_pos;
+                int c = IS_BLACK ? 7 - c_pos : c_pos;
+                m_ButtonArray[r_pos][c_pos] = new GridButton(r_pos, c_pos, m_Model.GetBoardState().GetState(r, c));
 
-                m_ButtonArray[i][j].addActionListener((e) -> {
+                m_ButtonArray[r_pos][c_pos].addActionListener(e -> {
                     if (IS_TURN) {
                         gridButtonAction((GridButton) e.getSource());
                     }
                 });
 
-                panel.add(m_ButtonArray[i][j]);
+                panel.add(m_ButtonArray[r_pos][c_pos]);
             }
         }
 
@@ -100,6 +100,7 @@ public class View {
         String player_colour = IS_BLACK ? "Black" : "White";
         m_Title = new JLabel(player_colour + " player");
 
+        // add everything to the panel
         m_Frame.add(panel, BorderLayout.CENTER);
         m_Frame.add(button, BorderLayout.SOUTH);
         m_Frame.add(m_Title, BorderLayout.NORTH);
@@ -110,41 +111,61 @@ public class View {
         Update();
     }
 
+    /**
+     * Method that runs every time a space is clicked, if it is the player's turn.
+     * Captures all available counters from the given space, and updates both views.
+     *
+     * @param b Button that has been clicked.
+     */
     private void gridButtonAction(GridButton b) {
         int row = b.GetRow();
         int col = b.GetCol();
 
-        Model.GetSelf().GetBoardState().SetState(row, col, IS_BLACK);
-        Model.GetSelf().GetBoardState().CaptureCounters(row, col, IS_BLACK);
+        m_Model.GetBoardState().SetState(row, col, IS_BLACK);
+        m_Model.GetBoardState().CaptureCounters(row, col, IS_BLACK);
 
-        Model.GetSelf().UpdateViews();
+        m_Model.UpdateViews();
     }
 
+    /**
+     * Method called when the AI player button is pressed.
+     * Finds the highest score position on the board, then plays that.
+     */
     private void aiButtonAction() {
-        GridButton highest = m_ButtonArray[0][0];
+        GridButton highestButton = getHighestScoreSpace();
+        int row = highestButton.GetRow();
+        int col = highestButton.GetCol();
 
-        // algorithm will find the highest value on the board
-        // and ignore subsequent spaces of equal value
-        // hence the first occurrence of the highest value will always be played
+        m_Model.GetBoardState().SetState(row, col, IS_BLACK);
+        m_Model.GetBoardState().CaptureCounters(row, col, IS_BLACK);
 
-        // todo : what fuck
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                int curr;
-                curr = Model.GetSelf().GetBoardState().CountCapture(i, j, IS_BLACK);
-                if (curr > highest.GetState()) {
-                    highest = m_ButtonArray[i][j];
+        m_Model.UpdateViews();
+    }
+
+    /**
+     * Method to find the highest score position on the board, used by the greedy AI.
+     *
+     * @return GridButton of the position with the highest score, if played.
+     */
+    private GridButton getHighestScoreSpace() {
+        GridButton highestButton = m_ButtonArray[0][0];
+        int highest = 0;
+
+        // loop through each position on the board
+        for (int r_pos = 0; r_pos < 8; r_pos++) {
+            for (int c_pos = 0; c_pos < 8; c_pos++) {
+                // get potential score from current space
+                int curr = m_Model.GetBoardState().CountCapture(r_pos, c_pos, IS_BLACK);
+
+                // set the highest space to current, and highest potential score to current
+                if (curr > highest) {
+                    highestButton = m_ButtonArray[r_pos][c_pos];
+                    highest = curr;
                 }
             }
         }
 
-        int row = highest.GetRow();
-        int col = highest.GetCol();
-
-        Model.GetSelf().GetBoardState().SetState(row, col, IS_BLACK);
-        Model.GetSelf().GetBoardState().CaptureCounters(row, col, IS_BLACK);
-
-        Model.GetSelf().UpdateViews();
+        return highestButton;
     }
 
     /**
@@ -155,46 +176,28 @@ public class View {
         if (IS_TURN) {
             IS_TURN = false;
             newTitle = m_Title.getText().replace(" (your turn)", "");
-            m_Title.setText(newTitle);
         } else {
             IS_TURN = true;
             newTitle = m_Title.getText().concat(" (your turn)");
-            m_Title.setText(newTitle);
         }
+        m_Title.setText(newTitle);
 
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        for (int r_pos = 0; r_pos < 8; r_pos++) {
+            for (int c_pos = 0; c_pos < 8; c_pos++) {
                 // code for updating button array states depending on external state array
                 // again the black player's board must be accessed in reverse
-                if (IS_BLACK) {
-                    m_ButtonArray[i][j].SetState(Model.GetSelf().GetBoardState().GetState(7 - i, 7 - j));
-                } else {
-                    m_ButtonArray[i][j].SetState(Model.GetSelf().GetBoardState().GetState(i, j));
-                }
+                int r_model = IS_BLACK ? 7 - r_pos : r_pos;
+                int c_model = IS_BLACK ? 7 - c_pos : c_pos;
 
-                // code for enabling/disabling buttons
-                // a button will be enabled if it is the current view's turn, and
-                // the space will capture at least 1 opposing piece
-                // if neither of these cases are fulfilled, the button is disabled
-                // i.e. the space is not playable
-                m_ButtonArray[i][j].setEnabled(IS_TURN && Model.GetSelf().GetBoardState().CountCapture(i, j, IS_BLACK) > 0);
+                m_ButtonArray[r_pos][c_pos].SetState(m_Model.GetBoardState().GetState(r_model, c_model));
+
+                // space is enabled if it is the current view's turn, and the space will capture
+                // at least 1 opposing piece - otherwise, the button is disabled
+                boolean buttonEnabled = IS_TURN && m_Model.GetBoardState().CountCapture(r_pos, c_pos, IS_BLACK) > 0;
+                m_ButtonArray[r_pos][c_pos].setEnabled(buttonEnabled);
             }
         }
 
         m_Frame.repaint();
-
-        // game will end if the entire board is full, or both players are in a stalemate
-//        if (Model.GetSelf().GetBoardState().CheckGameOver()) {
-//            String outDialog;
-//            int whiteScore = Model.GetSelf().GetBoardState().GetWhiteScore();
-//            int blackScore = Model.GetSelf().GetBoardState().GetBlackScore();
-//
-//            String winner_colour = (whiteScore > blackScore) ? "White" : "Black";
-//
-//            outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
-//
-//            JOptionPane.showMessageDialog(null, outDialog);
-//            System.exit(0);
-//        }
     }
 }

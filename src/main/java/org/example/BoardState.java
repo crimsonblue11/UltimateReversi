@@ -7,14 +7,11 @@
 package org.example;
 
 public class BoardState {
-    static final int INVALID_SPACE = -1;
-    static final int WHITE_SPACE = 2;
-    static final int BLACK_SPACE = 1;
-    static final int EMPTY_SPACE = 0;
+    static final int GRID_SIZE = 8;
     /**
      * 2D array representing each square of the board.
      */
-    private final int[][] m_BoardArray = new int[8][8];
+    private final SpaceState[][] m_BoardArray = new SpaceState[GRID_SIZE][GRID_SIZE];
     /**
      * Keeps track of black player's score.
      */
@@ -32,9 +29,9 @@ public class BoardState {
      * @param col Column of the queried space.
      * @return Value of the queried space.
      */
-    public int GetState(int row, int col) {
+    public SpaceState GetState(int row, int col) {
         if (row > 7 || col > 7 || row < 0 || col < 0) {
-            return INVALID_SPACE;
+            return SpaceState.INVALID;
         }
         return m_BoardArray[row][col];
     }
@@ -56,9 +53,9 @@ public class BoardState {
      */
     public void SetState(int row, int col, boolean isBlack) {
         if (isBlack) {
-            m_BoardArray[7 - row][7 - col] = BLACK_SPACE;
+            m_BoardArray[7 - row][7 - col] = SpaceState.BLACK;
         } else {
-            m_BoardArray[row][col] = WHITE_SPACE;
+            m_BoardArray[row][col] = SpaceState.WHITE;
         }
     }
 
@@ -66,11 +63,17 @@ public class BoardState {
      * Constructor method to place initial counters on the board.
      */
     public BoardState() {
+        for(int r = 0; r < GRID_SIZE; r++) {
+            for(int c = 0; c < GRID_SIZE; c++) {
+                m_BoardArray[r][c] = SpaceState.EMPTY;
+            }
+        }
+
         // hardcode the counters that start on the board
-        m_BoardArray[3][3] = WHITE_SPACE;
-        m_BoardArray[3][4] = BLACK_SPACE;
-        m_BoardArray[4][3] = BLACK_SPACE;
-        m_BoardArray[4][4] = WHITE_SPACE;
+        m_BoardArray[3][3] = SpaceState.WHITE;
+        m_BoardArray[3][4] = SpaceState.BLACK;
+        m_BoardArray[4][3] = SpaceState.BLACK;
+        m_BoardArray[4][4] = SpaceState.WHITE;
     }
 
     /**
@@ -101,10 +104,10 @@ public class BoardState {
                 int r_pos = row + r_offset;
                 int c_pos = col + c_offset;
 
-                int currentSpace = GetState(r_pos, c_pos);
+                SpaceState currentSpace = GetState(r_pos, c_pos);
 
-                int CURRENT_COLOUR = m_BoardArray[row][col];
-                int OPPOSITE_COLOUR = isBlack ? WHITE_SPACE : BLACK_SPACE;
+                SpaceState CURRENT_COLOUR = m_BoardArray[row][col];
+                SpaceState OPPOSITE_COLOUR = isBlack ? SpaceState.WHITE : SpaceState.BLACK;
                 if (currentSpace != OPPOSITE_COLOUR) {
                     continue;
                 }
@@ -146,11 +149,11 @@ public class BoardState {
             col = 7 - col;
         }
 
-        int COUNTER_COLOUR = isBlack ? BLACK_SPACE : WHITE_SPACE;
-        int OPPOSITE_COLOUR = isBlack ? WHITE_SPACE : BLACK_SPACE;
+        SpaceState COUNTER_COLOUR = isBlack ? SpaceState.BLACK : SpaceState.WHITE;
+        SpaceState OPPOSITE_COLOUR = isBlack ? SpaceState.WHITE : SpaceState.BLACK;
 
         // return zero for non-empty (unplayable) spaces
-        if (GetState(row, col) != EMPTY_SPACE) {
+        if (GetState(row, col) != SpaceState.EMPTY) {
             return 0;
         }
 
@@ -159,17 +162,20 @@ public class BoardState {
         int finalCount = 0; // variable to keep track of how many pieces will be captured if played
         for (int r_offset = -1; r_offset <= 1; r_offset++) {
             for (int c_offset = -1; c_offset <= 1; c_offset++) {
+                System.out.println("entered");
 
                 int r_pos = row + r_offset;
                 int c_pos = col + c_offset;
 
+
                 // if | offset | = 0 or space is invalid, skip to next one
-                if ((r_offset == 0 && c_offset == 0) || GetState(r_pos, c_pos) == INVALID_SPACE) {
+                if ((r_offset == 0 && c_offset == 0) || GetState(r_pos, c_pos) == SpaceState.INVALID) {
+                    System.out.println("continued");
                     continue;
                 }
                 // if out of bounds, skip over it
 
-                int currentCounter = m_BoardArray[r_pos][c_pos];
+                SpaceState currentCounter = m_BoardArray[r_pos][c_pos];
                 int numChecked = 0; // variable to keep track of how many have been checked
 
                 // keep going in the same direction if the curr is of the opposite colour
@@ -187,6 +193,7 @@ public class BoardState {
             }
         }
 
+        System.out.println("returned " + finalCount);
         return finalCount;
     }
 
@@ -214,9 +221,9 @@ public class BoardState {
                     return false;
                 }
 
-                if (m_BoardArray[r_pos][c_pos] == BLACK_SPACE) {
+                if (m_BoardArray[r_pos][c_pos] == SpaceState.BLACK) {
                     blackScore++;
-                } else if (m_BoardArray[r_pos][c_pos] == WHITE_SPACE) {
+                } else if (m_BoardArray[r_pos][c_pos] == SpaceState.WHITE) {
                     whiteScore++;
                 }
             }
