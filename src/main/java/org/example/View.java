@@ -184,16 +184,17 @@ public class View {
         m_Frame.repaint();
 
         // game will end if the entire board is full, or both players are in a stalemate
-        if (Model.GetSelf().GetBoardState().CheckGameOver()) {
-            String outDialog;
-            int[] scores = Model.GetSelf().GetBoardState().GetScore();
-            if (scores[0] > scores[1]) {
-                outDialog = "White wins: " + scores[0] + " : " + scores[1];
-            } else {
-                outDialog = "Black wins: " + scores[0] + " : " + scores[1];
-            }
-            JOptionPane.showMessageDialog(null, outDialog);
-            System.exit(0);
-        }
+//        if (Model.GetSelf().GetBoardState().CheckGameOver()) {
+//            String outDialog;
+//            int whiteScore = Model.GetSelf().GetBoardState().GetWhiteScore();
+//            int blackScore = Model.GetSelf().GetBoardState().GetBlackScore();
+//
+//            String winner_colour = (whiteScore > blackScore) ? "White" : "Black";
+//
+//            outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
+//
+//            JOptionPane.showMessageDialog(null, outDialog);
+//            System.exit(0);
+//        }
     }
 }

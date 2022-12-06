@@ -7,6 +7,7 @@
  */
 package org.example;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class Model {
@@ -57,6 +58,19 @@ public class Model {
     public void UpdateViews() {
         for (View listOfView : m_ViewArray) {
             listOfView.Update();
+        }
+
+        if (Model.GetSelf().GetBoardState().CheckGameOver()) {
+            String outDialog;
+            int whiteScore = Model.GetSelf().GetBoardState().GetWhiteScore();
+            int blackScore = Model.GetSelf().GetBoardState().GetBlackScore();
+
+            String winner_colour = (whiteScore > blackScore) ? "White" : "Black";
+
+            outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
+
+            JOptionPane.showMessageDialog(null, outDialog);
+            System.exit(0);
         }
     }
 }
