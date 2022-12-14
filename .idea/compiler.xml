@@ -9,5 +9,8 @@
         <module name="Reversi" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Reversi" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

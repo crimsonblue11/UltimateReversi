@@ -10,6 +10,7 @@ package org.example.reversi;
 import javafx.fxml.FXML;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 
 public class StartController {
     /**
@@ -106,12 +107,13 @@ public class StartController {
 
     /**
      * Method to handle 'Play' button action.
-     * Calls {@code StartStage.loadGame()}.
+     * Calls {@code StartStage.loadGame()} and sets player counter colours.
      *
      * @see StartStage#loadGame()
      */
     @FXML
     private void handlePlay() {
+        StartStage.setPlayerColours(p1colour.getValue(), p2colour.getValue());
         StartStage.getInstance().loadGame();
     }
 

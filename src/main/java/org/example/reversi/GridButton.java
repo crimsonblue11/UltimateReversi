@@ -117,11 +117,11 @@ public class GridButton extends Canvas {
         GR.fillRect(0, 0, SIZE, SIZE);
         drawSpace();
 
-        if (m_State == SpaceState.WHITE) {
-            GR.setFill(Color.WHITE);
+        if (m_State == SpaceState.PLAYER_2) {
+            GR.setFill(StartStage.getP2Color());
             GR.fillOval(0, 0, getWidth(), getHeight());
-        } else if (m_State == SpaceState.BLACK) {
-            GR.setFill(Color.BLACK);
+        } else if (m_State == SpaceState.PLAYER_1) {
+            GR.setFill(StartStage.getP1Color());
             GR.fillOval(0, 0, getWidth(), getHeight());
         }
     }

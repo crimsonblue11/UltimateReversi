@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -28,9 +29,9 @@ public class PlayerView extends Stage {
      */
     private final GridButton[][] m_ButtonArray = new GridButton[8][8];
     /**
-     * Boolean representing the colour of this view's player - true if black, false if white.
+     * Boolean representing this view's player - true if player 1, false if player 2.
      */
-    private final boolean IS_BLACK;
+    private final boolean IS_PLAYER1;
     /**
      * Boolean set to true if the current turn is this view's turn.
      */
@@ -51,18 +52,18 @@ public class PlayerView extends Stage {
     /**
      * Constructor method.
      *
-     * @param isBlack sets member variable isBlack
+     * @param isPlayer1 Value to set {@code IS_PLAYER1}.
      */
-    public PlayerView(boolean isBlack) {
+    public PlayerView(boolean isPlayer1) {
         m_Model = Model.getSelf();
         m_Model.storeView(this);
 
         setTitle("Reversi");
 
         // when update is called, the current turn will switch
-        // white goes first, so when initialised the roles must be switched
-        IS_TURN = isBlack;
-        IS_BLACK = isBlack;
+        // player 1 goes first, so when initialised the roles must be switched
+        IS_TURN = !isPlayer1;
+        IS_PLAYER1 = isPlayer1;
     }
 
     /**
@@ -80,8 +81,8 @@ public class PlayerView extends Stage {
 
         for (int r_pos = 0; r_pos < BoardState.GRID_SIZE; r_pos++) {
             for (int c_pos = 0; c_pos < BoardState.GRID_SIZE; c_pos++) {
-                int r = IS_BLACK ? 7 - r_pos : r_pos;
-                int c = IS_BLACK ? 7 - c_pos : c_pos;
+                int r = IS_PLAYER1 ? 7 - r_pos : r_pos;
+                int c = IS_PLAYER1 ? 7 - c_pos : c_pos;
                 m_ButtonArray[r_pos][c_pos] = new GridButton(r_pos, c_pos, m_Model.getBoardState().getState(r, c));
 
                 m_ButtonArray[r_pos][c_pos].setOnMouseClicked(e -> {
@@ -104,8 +105,7 @@ public class PlayerView extends Stage {
             }
         });
 
-        String player_colour = IS_BLACK ? "Black" : "White";
-        m_Title = new Label(player_colour + " player");
+        m_Title = new Label(IS_PLAYER1 ? "Player 1" : "Player 2");
 
         root.setCenter(grid);
         root.setBottom(aiButton);
@@ -129,8 +129,8 @@ public class PlayerView extends Stage {
         int row = b.getRow();
         int col = b.getCol();
 
-        m_Model.getBoardState().setState(row, col, IS_BLACK);
-        m_Model.getBoardState().captureCounters(row, col, IS_BLACK);
+        m_Model.getBoardState().setState(row, col, IS_PLAYER1);
+        m_Model.getBoardState().captureCounters(row, col, IS_PLAYER1);
 
         m_Model.updateViews();
     }
@@ -144,8 +144,8 @@ public class PlayerView extends Stage {
         int row = highestButton.getRow();
         int col = highestButton.getCol();
 
-        m_Model.getBoardState().setState(row, col, IS_BLACK);
-        m_Model.getBoardState().captureCounters(row, col, IS_BLACK);
+        m_Model.getBoardState().setState(row, col, IS_PLAYER1);
+        m_Model.getBoardState().captureCounters(row, col, IS_PLAYER1);
 
         m_Model.updateViews();
     }
@@ -163,7 +163,7 @@ public class PlayerView extends Stage {
         for (int r_pos = 0; r_pos < 8; r_pos++) {
             for (int c_pos = 0; c_pos < 8; c_pos++) {
                 // get potential score from current space
-                int curr = m_Model.getBoardState().countCapture(r_pos, c_pos, IS_BLACK);
+                int curr = m_Model.getBoardState().countCapture(r_pos, c_pos, IS_PLAYER1);
 
                 // set the highest space to current, and highest potential score to current
                 if (curr > highest) {
@@ -192,12 +192,12 @@ public class PlayerView extends Stage {
 
         for (int r_pos = 0; r_pos < 8; r_pos++) {
             for (int c_pos = 0; c_pos < 8; c_pos++) {
-                int r_model = IS_BLACK ? 7 - r_pos : r_pos;
-                int c_model = IS_BLACK ? 7 - c_pos : c_pos;
+                int r_model = IS_PLAYER1 ? 7 - r_pos : r_pos;
+                int c_model = IS_PLAYER1 ? 7 - c_pos : c_pos;
 
                 m_ButtonArray[r_pos][c_pos].setState(m_Model.getBoardState().getState(r_model, c_model));
 
-                boolean buttonEnabled = IS_TURN && m_Model.getBoardState().countCapture(r_pos, c_pos, IS_BLACK) > 0;
+                boolean buttonEnabled = IS_TURN && m_Model.getBoardState().countCapture(r_pos, c_pos, IS_PLAYER1) > 0;
                 m_ButtonArray[r_pos][c_pos].setDisable(!buttonEnabled);
 
                 m_ButtonArray[r_pos][c_pos].update();
