@@ -63,17 +63,7 @@ public class BoardState {
      * Constructor method to place initial counters on the board.
      */
     public BoardState() {
-        for(int r = 0; r < GRID_SIZE; r++) {
-            for(int c = 0; c < GRID_SIZE; c++) {
-                m_BoardArray[r][c] = SpaceState.EMPTY;
-            }
-        }
-
-        // hardcode the counters that start on the board
-        m_BoardArray[3][3] = SpaceState.WHITE;
-        m_BoardArray[3][4] = SpaceState.BLACK;
-        m_BoardArray[4][3] = SpaceState.BLACK;
-        m_BoardArray[4][4] = SpaceState.WHITE;
+        setBoard();
     }
 
     /**
@@ -230,5 +220,18 @@ public class BoardState {
         m_BlackStore = blackScore;
         m_WhiteScore = whiteScore;
         return true;
+    }
+
+    public void setBoard() {
+        for(int r = 0; r < GRID_SIZE; r++) {
+            for(int c = 0; c < GRID_SIZE; c++) {
+                m_BoardArray[r][c] = SpaceState.EMPTY;
+            }
+        }
+
+        m_BoardArray[3][3] = SpaceState.WHITE;
+        m_BoardArray[3][4] = SpaceState.BLACK;
+        m_BoardArray[4][3] = SpaceState.BLACK;
+        m_BoardArray[4][4] = SpaceState.WHITE;
     }
 }

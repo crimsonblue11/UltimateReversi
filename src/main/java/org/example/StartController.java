@@ -1,6 +1,5 @@
 package org.example;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -58,7 +57,7 @@ public class StartController {
 
     @FXML
     private void handlePlay() {
-        // todo : play game
+        StartStage.getInstance().loadGame();
     }
 
     private void updateGMText() {

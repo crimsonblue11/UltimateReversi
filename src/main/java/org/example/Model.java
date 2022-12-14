@@ -7,14 +7,15 @@
  */
 package org.example;
 
-import javax.swing.*;
+import javafx.scene.control.Alert;
+
 import java.util.ArrayList;
 
 public class Model {
     /**
      * ArrayList of all views to update.
      */
-    private final ArrayList<View> m_ViewArray = new ArrayList<>();
+    private final ArrayList<PlayerView> m_ViewArray = new ArrayList<>();
     /**
      * Static instance.
      */
@@ -48,7 +49,7 @@ public class Model {
      *
      * @param view View to add to the list of views.
      */
-    public void StoreView(View view) {
+    public void StoreView(PlayerView view) {
         m_ViewArray.add(view);
     }
 
@@ -60,8 +61,8 @@ public class Model {
      * @see BoardState#CheckGameOver()
      */
     public void UpdateViews() {
-        for (View listOfView : m_ViewArray) {
-            listOfView.Update();
+        for (PlayerView v : m_ViewArray) {
+            v.Update();
         }
 
         if (m_BoardState.CheckGameOver()) {
@@ -72,8 +73,19 @@ public class Model {
 
             String outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
 
-            JOptionPane.showMessageDialog(null, outDialog);
-            System.exit(0);
+            Alert winner_alert = new Alert(Alert.AlertType.INFORMATION, outDialog);
+            winner_alert.showAndWait();
+            StartStage.getInstance().show();
+
+            endGame();
         }
+    }
+
+    private void endGame() {
+        for(PlayerView v : m_ViewArray) {
+            v.close();
+        }
+
+        m_BoardState.setBoard();
     }
 }

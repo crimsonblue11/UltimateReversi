@@ -18,8 +18,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-public class View extends Stage {
-    private Scene m_Scene;
+public class PlayerView extends Stage {
     private final Model m_Model;
     /**
      * Array containing all spaces on the board, as drawn from this view.
@@ -45,7 +44,7 @@ public class View extends Stage {
      *
      * @param isBlack sets member variable isBlack
      */
-    public View(boolean isBlack) {
+    public PlayerView(boolean isBlack) {
         m_Model = Model.GetSelf();
         m_Model.StoreView(this);
 
@@ -103,7 +102,7 @@ public class View extends Stage {
         root.setBottom(aiButton);
         root.setTop(m_Title);
 
-        m_Scene = new Scene(root);
+        Scene m_Scene = new Scene(root);
         setScene(m_Scene);
 
         show();
@@ -202,5 +201,18 @@ public class View extends Stage {
 
 //        m_Frame.repaint();
         // might need jfx equivalent of this
+    }
+
+    @Override
+    public void close() {
+        for(GridButton[] l : m_ButtonArray) {
+            for(GridButton g : l) {
+                g.SetState(SpaceState.EMPTY);
+            }
+        }
+
+        Update();
+
+        super.close();
     }
 }
