@@ -26,18 +26,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        Scene scene = null;
-        try {
-            scene = new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/layout/startScreen.fxml"))));
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/layout/style.css")).toExternalForm());
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(e.hashCode());
-        }
-
-        Stage mainStage = new Stage();
-        mainStage.setScene(scene);
-        mainStage.show();
+        stage.setScene(new StartScene());
+        stage.show();
 //        new View(false).CreateGUI();
 //        new View(true).CreateGUI();
     }
