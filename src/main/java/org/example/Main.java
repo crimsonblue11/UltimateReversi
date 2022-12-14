@@ -8,7 +8,12 @@
 package org.example;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class Main extends Application {
     /**
@@ -21,7 +26,19 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        new View(false).CreateGUI();
-        new View(true).CreateGUI();
+        Scene scene = null;
+        try {
+            scene = new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/layout/startScreen.fxml"))));
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/layout/style.css")).toExternalForm());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(e.hashCode());
+        }
+
+        Stage mainStage = new Stage();
+        mainStage.setScene(scene);
+        mainStage.show();
+//        new View(false).CreateGUI();
+//        new View(true).CreateGUI();
     }
 }
