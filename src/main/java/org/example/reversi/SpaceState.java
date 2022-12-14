@@ -8,13 +8,13 @@ package org.example.reversi;
 
 public enum SpaceState {
     /**
-     * This state represents a black counter in a space.
+     * This state represents player 1's counter in a space.
      */
-    BLACK,
+    PLAYER_1,
     /**
-     * This state represents a white counter in a space.
+     * This state represents player 2's counter in a space.
      */
-    WHITE,
+    PLAYER_2,
     /**
      * This state represents no counter in a space.
      */

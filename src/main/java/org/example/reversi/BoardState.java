@@ -7,19 +7,24 @@
 package org.example.reversi;
 
 public class BoardState {
+    /**
+     * Constant representing the number of grids per row or column.
+     * Note this value is the same, as it is a square grid.
+     * Set to {@value} by default.
+     */
     static final int GRID_SIZE = 8;
     /**
      * 2D array representing each square of the board.
      */
     private final SpaceState[][] m_BoardArray = new SpaceState[GRID_SIZE][GRID_SIZE];
     /**
-     * Keeps track of black player's score.
+     * Integer storing player 1's score.
      */
-    private int m_BlackStore = 0;
+    private int m_P1Score = 0;
     /**
-     * Keeps track of white player's score.
+     * Integer storing player 2's score.
      */
-    private int m_WhiteScore = 0;
+    private int m_P2Score = 0;
 
     /**
      * Accessor method for the state of a given space.
@@ -37,31 +42,31 @@ public class BoardState {
     }
 
     /**
-     * Accessor method for black player's score.
+     * Accessor method for Player 1's score.
      */
-    public int getBlackScore() {
-        return m_BlackStore;
+    public int getPlayer1Score() {
+        return m_P1Score;
     }
 
     /**
-     * Accessor method for white player's score.
+     * Accessor method for Player 2's score.
      */
-    public int getWhiteScore() {
-        return m_WhiteScore;
+    public int getPlayer2Score() {
+        return m_P2Score;
     }
 
     /**
      * Mutator method for individual board spaces.
      *
-     * @param row     Row of the space to change.
-     * @param col     Column of the space to change.
-     * @param isBlack Boolean representing the colour to change the space to - true if black, false if white.
+     * @param row       Row of the space to change.
+     * @param col       Column of the space to change.
+     * @param isPlayer1 Boolean representing the player of the space - true if player 1, false if player 2.
      */
-    public void setState(int row, int col, boolean isBlack) {
-        if (isBlack) {
-            m_BoardArray[7 - row][7 - col] = SpaceState.BLACK;
+    public void setState(int row, int col, boolean isPlayer1) {
+        if (isPlayer1) {
+            m_BoardArray[7 - row][7 - col] = SpaceState.PLAYER_1;
         } else {
-            m_BoardArray[row][col] = SpaceState.WHITE;
+            m_BoardArray[row][col] = SpaceState.PLAYER_2;
         }
     }
 
@@ -80,13 +85,13 @@ public class BoardState {
      * Inputs represent the counter that has been placed, and the method will calculate
      * how many of the enemy's pieces will be captured, and then capture them.
      *
-     * @param row     The row of the counter that has been placed.
-     * @param col     The column of the counter that has been placed.
-     * @param isBlack Boolean representing the colour of the placed piece - true if black, false if white.
+     * @param row       The row of the counter that has been placed.
+     * @param col       The column of the counter that has been placed.
+     * @param isPlayer1 Boolean representing the playing player - true if player 1, false if player 2.
      */
-    public void captureCounters(int row, int col, boolean isBlack) {
-        // access spaces in reverse if black view, since upside-down
-        if (isBlack) {
+    public void captureCounters(int row, int col, boolean isPlayer1) {
+        // access spaces in reverse if player 1, since upside-down
+        if (isPlayer1) {
             row = 7 - row;
             col = 7 - col;
         }
@@ -106,7 +111,7 @@ public class BoardState {
                 SpaceState currentSpace = getState(r_pos, c_pos);
 
                 SpaceState CURRENT_COLOUR = m_BoardArray[row][col];
-                SpaceState OPPOSITE_COLOUR = isBlack ? SpaceState.WHITE : SpaceState.BLACK;
+                SpaceState OPPOSITE_COLOUR = isPlayer1 ? SpaceState.PLAYER_2 : SpaceState.PLAYER_1;
                 if (currentSpace != OPPOSITE_COLOUR) {
                     continue;
                 }
@@ -136,20 +141,21 @@ public class BoardState {
      * the system to keep a track of how many counters have been captured, which is used to calculate
      * who has one and is displayed after the game is over.
      *
-     * @param row     Row of the space that is being calculated.
-     * @param col     Column of the space that is being calculated.
-     * @param isBlack Boolean representing which side the potential play is coming from - true if black, false if white.
+     * @param row       Row of the space that is being calculated.
+     * @param col       Column of the space that is being calculated.
+     * @param isPlayer1 Boolean representing which side the potential play is coming from -
+     *                  true if player 1, false if player 2.
      * @return Number of spaces that can be captured if the input move is played.
      */
-    public int countCapture(int row, int col, boolean isBlack) {
-        // black inputs are reversed since the view is upside-down
-        if (isBlack) {
+    public int countCapture(int row, int col, boolean isPlayer1) {
+        // player 1's inputs are reversed since the view is upside-down
+        if (isPlayer1) {
             row = 7 - row;
             col = 7 - col;
         }
 
-        SpaceState COUNTER_COLOUR = isBlack ? SpaceState.BLACK : SpaceState.WHITE;
-        SpaceState OPPOSITE_COLOUR = isBlack ? SpaceState.WHITE : SpaceState.BLACK;
+        SpaceState COUNTER_COLOUR = isPlayer1 ? SpaceState.PLAYER_1 : SpaceState.PLAYER_2;
+        SpaceState OPPOSITE_COLOUR = isPlayer1 ? SpaceState.PLAYER_2 : SpaceState.PLAYER_1;
 
         // return zero for non-empty (unplayable) spaces
         if (getState(row, col) != SpaceState.EMPTY) {
@@ -201,8 +207,8 @@ public class BoardState {
      */
     public boolean checkGameOver() {
         // local to the function, so they're reset if false is returned
-        int blackScore = 0;
-        int whiteScore = 0;
+        int p1Score = 0;
+        int p2Score = 0;
 
         for (int r_pos = 0; r_pos < 8; r_pos++) {
             for (int c_pos = 0; c_pos < 8; c_pos++) {
@@ -216,18 +222,18 @@ public class BoardState {
                     return false;
                 }
 
-                if (m_BoardArray[r_pos][c_pos] == SpaceState.BLACK) {
-                    blackScore++;
-                } else if (m_BoardArray[r_pos][c_pos] == SpaceState.WHITE) {
-                    whiteScore++;
+                if (m_BoardArray[r_pos][c_pos] == SpaceState.PLAYER_1) {
+                    p1Score++;
+                } else if (m_BoardArray[r_pos][c_pos] == SpaceState.PLAYER_2) {
+                    p2Score++;
                 }
             }
         }
 
         // no playable spaces, game must be over
         // set member variables
-        m_BlackStore = blackScore;
-        m_WhiteScore = whiteScore;
+        m_P1Score = p1Score;
+        m_P2Score = p2Score;
         return true;
     }
 
@@ -244,9 +250,10 @@ public class BoardState {
             }
         }
 
-        m_BoardArray[3][3] = SpaceState.WHITE;
-        m_BoardArray[3][4] = SpaceState.BLACK;
-        m_BoardArray[4][3] = SpaceState.BLACK;
-        m_BoardArray[4][4] = SpaceState.WHITE;
+        m_BoardArray[3][3] = SpaceState.PLAYER_2;
+        m_BoardArray[4][4] = SpaceState.PLAYER_2;
+
+        m_BoardArray[3][4] = SpaceState.PLAYER_1;
+        m_BoardArray[4][3] = SpaceState.PLAYER_1;
     }
 }

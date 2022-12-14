@@ -84,12 +84,12 @@ public class Model {
      * @since 1.1
      */
     private void endGame() {
-        int whiteScore = m_BoardState.getWhiteScore();
-        int blackScore = m_BoardState.getBlackScore();
+        int p2Score = m_BoardState.getPlayer2Score();
+        int p1Score = m_BoardState.getPlayer1Score();
 
-        String winner_colour = (whiteScore > blackScore) ? "White" : "Black";
+        String winner_text = (p2Score > p1Score) ? "Player 2" : "Player 1";
 
-        String outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
+        String outDialog = winner_text + " wins: " + p2Score + " : " + p1Score;
 
         Alert winner_alert = new Alert(Alert.AlertType.INFORMATION, outDialog);
         winner_alert.showAndWait();

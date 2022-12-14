@@ -19,24 +19,26 @@
     </bottom>
     <center>
         <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-            <Label fx:id="gamemodelabel" alignment="CENTER" contentDisplay="CENTER" layoutX="133.0" layoutY="95.0"
-                   prefHeight="30.0" prefWidth="334.0" styleClass="start-selector-title" text="Gamemode"
+            <Label fx:id="gamemodelabel" alignment="CENTER" contentDisplay="CENTER" layoutX="133.0" layoutY="83.0"
+                   prefHeight="42.0" prefWidth="334.0" styleClass="start-selector-title" text="Gamemode"
                    textAlignment="CENTER"/>
             <Label fx:id="gamemodedesc" alignment="CENTER" contentDisplay="CENTER" layoutX="199.0" layoutY="116.0"
                    prefHeight="82.0" prefWidth="203.0" text="Desc - this is a placeholder, lorem ipsum etc."
                    textAlignment="CENTER" wrapText="true"/>
-            <Button layoutX="147.0" layoutY="125.0" mnemonicParsing="false" onAction="#handleModeLeft"
+            <Button layoutX="161.0" layoutY="125.0" mnemonicParsing="false" onAction="#handleModeLeft"
                     styleClass="start-button-small" text="&lt;"/>
-            <Button layoutX="398.0" layoutY="125.0" mnemonicParsing="false" onAction="#handleModeRight"
+            <Button layoutX="418.0" layoutY="125.0" mnemonicParsing="false" onAction="#handleModeRight"
                     styleClass="start-button-small" text="&gt;"/>
-            <ColorPicker fx:id="p1colour" editable="true" layoutX="108.0" layoutY="331.0"/>
-            <Label layoutX="81.0" layoutY="288.0" styleClass="start-selector-title" text="Player 1 Colour"/>
-            <ColorPicker fx:id="p2colour" editable="true" layoutX="340.0" layoutY="331.0">
+            <ColorPicker fx:id="p1colour" editable="true" layoutX="14.0" layoutY="331.0">
                 <value>
                     <Color/>
                 </value>
             </ColorPicker>
-            <Label layoutX="313.0" layoutY="288.0" styleClass="start-selector-title" text="Player 2 Colour"/>
+            <Label contentDisplay="RIGHT" layoutX="14.0" layoutY="281.0" prefHeight="23.0" prefWidth="285.0"
+                   styleClass="start-selector-title" text="Player 1 Colour" textOverrun="CLIP"/>
+            <ColorPicker fx:id="p2colour" editable="true" layoutX="432.0" layoutY="331.0"/>
+            <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="294.0" layoutY="279.0" prefHeight="27.0"
+                   prefWidth="292.0" styleClass="start-selector-title" text="Player 2 Colour" textOverrun="CLIP"/>
         </AnchorPane>
     </center>
 </BorderPane>
