@@ -1,33 +1,32 @@
 /**
- * Class for drawing the window, game board, and everything else for each window.
- * Also handles some logic.
+ * Class for drawing the window, game board, and everything else for each player's window.
+ * Also handles some game logic.
  *
  * @author Medusa Dempsey
- * @version 1.0
+ * @version 1.1
  */
 
-package org.example;
+package org.example.reversi;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-public class View {
+public class PlayerView extends Stage {
+    /**
+     * Model object reference.
+     */
     private final Model m_Model;
     /**
      * Array containing all spaces on the board, as drawn from this view.
      */
     private final GridButton[][] m_ButtonArray = new GridButton[8][8];
-    /**
-     * JFrame containing the view.
-     */
-    private final JFrame m_Frame = new JFrame();
     /**
      * Boolean representing the colour of this view's player - true if black, false if white.
      */
@@ -39,20 +38,26 @@ public class View {
     /**
      * Title of the screen of this view.
      */
-    private JLabel m_Title;
-    final static int WIN_WIDTH = 600;
-    final static int WIN_HEIGHT = 700;
+    private Label m_Title;
+    /**
+     * Constant representing width of the game window.
+     */
+    final static int WIN_WIDTH = 600; // todo : move to another class
+    /**
+     * Constant representing height of the game window.
+     */
+    final static int WIN_HEIGHT = 700; // todo : move to another class
 
     /**
      * Constructor method.
      *
      * @param isBlack sets member variable isBlack
      */
-    public View(boolean isBlack) {
-        m_Model = Model.GetSelf();
-        m_Model.StoreView(this);
+    public PlayerView(boolean isBlack) {
+        m_Model = Model.getSelf();
+        m_Model.storeView(this);
 
-        m_Frame.setTitle("Reversi");
+        setTitle("Reversi");
 
         // when update is called, the current turn will switch
         // white goes first, so when initialised the roles must be switched
@@ -61,54 +66,57 @@ public class View {
     }
 
     /**
-     * Method for creating the GUI of this view.
+     * Method for creating this view's GUI.
      */
-    public void CreateGUI() {
-        m_Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        m_Frame.setLayout(new BorderLayout());
-        m_Frame.setPreferredSize(new Dimension(WIN_WIDTH, WIN_HEIGHT));
+    public void createGUI() {
+        setOnCloseRequest(e -> System.exit(0));
+        setWidth(WIN_WIDTH);
+        setHeight(WIN_HEIGHT);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(BoardState.GRID_SIZE, BoardState.GRID_SIZE));
+        BorderPane root = new BorderPane();
+
+        GridPane grid = new GridPane();
+        root.setCenter(grid);
 
         for (int r_pos = 0; r_pos < BoardState.GRID_SIZE; r_pos++) {
             for (int c_pos = 0; c_pos < BoardState.GRID_SIZE; c_pos++) {
                 int r = IS_BLACK ? 7 - r_pos : r_pos;
                 int c = IS_BLACK ? 7 - c_pos : c_pos;
-                m_ButtonArray[r_pos][c_pos] = new GridButton(r_pos, c_pos, m_Model.GetBoardState().GetState(r, c));
+                m_ButtonArray[r_pos][c_pos] = new GridButton(r_pos, c_pos, m_Model.getBoardState().getState(r, c));
 
-                m_ButtonArray[r_pos][c_pos].addActionListener(e -> {
+                m_ButtonArray[r_pos][c_pos].setOnMouseClicked(e -> {
                     if (IS_TURN) {
                         gridButtonAction((GridButton) e.getSource());
                     }
                 });
 
-                panel.add(m_ButtonArray[r_pos][c_pos]);
+                grid.add(m_ButtonArray[r_pos][c_pos], r_pos, c_pos);
             }
         }
 
         // code for greedy AI button
-        JButton button = new JButton("Make greedy AI move");
-        button.setFont(new Font("Ariel", Font.BOLD, 20));
+        Button aiButton = new Button("Make greedy AI move");
+        aiButton.setFont(Font.font("Ariel", FontWeight.BOLD, FontPosture.REGULAR, 20));
 
-        button.addActionListener(e -> {
+        aiButton.setOnMouseClicked(e -> {
             if (IS_TURN) {
                 aiButtonAction();
             }
         });
 
         String player_colour = IS_BLACK ? "Black" : "White";
-        m_Title = new JLabel(player_colour + " player");
+        m_Title = new Label(player_colour + " player");
 
-        // add everything to the panel
-        m_Frame.add(panel, BorderLayout.CENTER);
-        m_Frame.add(button, BorderLayout.SOUTH);
-        m_Frame.add(m_Title, BorderLayout.NORTH);
+        root.setCenter(grid);
+        root.setBottom(aiButton);
+        root.setTop(m_Title);
 
-        m_Frame.pack();
-        m_Frame.setVisible(true);
+        Scene m_Scene = new Scene(root);
+        setScene(m_Scene);
 
-        Update();
+        show();
+
+        update();
     }
 
     /**
@@ -118,13 +126,13 @@ public class View {
      * @param b Button that has been clicked.
      */
     private void gridButtonAction(GridButton b) {
-        int row = b.GetRow();
-        int col = b.GetCol();
+        int row = b.getRow();
+        int col = b.getCol();
 
-        m_Model.GetBoardState().SetState(row, col, IS_BLACK);
-        m_Model.GetBoardState().CaptureCounters(row, col, IS_BLACK);
+        m_Model.getBoardState().setState(row, col, IS_BLACK);
+        m_Model.getBoardState().captureCounters(row, col, IS_BLACK);
 
-        m_Model.UpdateViews();
+        m_Model.updateViews();
     }
 
     /**
@@ -133,13 +141,13 @@ public class View {
      */
     private void aiButtonAction() {
         GridButton highestButton = getHighestScoreSpace();
-        int row = highestButton.GetRow();
-        int col = highestButton.GetCol();
+        int row = highestButton.getRow();
+        int col = highestButton.getCol();
 
-        m_Model.GetBoardState().SetState(row, col, IS_BLACK);
-        m_Model.GetBoardState().CaptureCounters(row, col, IS_BLACK);
+        m_Model.getBoardState().setState(row, col, IS_BLACK);
+        m_Model.getBoardState().captureCounters(row, col, IS_BLACK);
 
-        m_Model.UpdateViews();
+        m_Model.updateViews();
     }
 
     /**
@@ -155,7 +163,7 @@ public class View {
         for (int r_pos = 0; r_pos < 8; r_pos++) {
             for (int c_pos = 0; c_pos < 8; c_pos++) {
                 // get potential score from current space
-                int curr = m_Model.GetBoardState().CountCapture(r_pos, c_pos, IS_BLACK);
+                int curr = m_Model.getBoardState().countCapture(r_pos, c_pos, IS_BLACK);
 
                 // set the highest space to current, and highest potential score to current
                 if (curr > highest) {
@@ -171,7 +179,7 @@ public class View {
     /**
      * Update method. Called every time a piece is played, for both views.
      */
-    public void Update() {
+    public void update() {
         String newTitle;
         if (IS_TURN) {
             IS_TURN = false;
@@ -184,20 +192,36 @@ public class View {
 
         for (int r_pos = 0; r_pos < 8; r_pos++) {
             for (int c_pos = 0; c_pos < 8; c_pos++) {
-                // code for updating button array states depending on external state array
-                // again the black player's board must be accessed in reverse
                 int r_model = IS_BLACK ? 7 - r_pos : r_pos;
                 int c_model = IS_BLACK ? 7 - c_pos : c_pos;
 
-                m_ButtonArray[r_pos][c_pos].SetState(m_Model.GetBoardState().GetState(r_model, c_model));
+                m_ButtonArray[r_pos][c_pos].setState(m_Model.getBoardState().getState(r_model, c_model));
 
-                // space is enabled if it is the current view's turn, and the space will capture
-                // at least 1 opposing piece - otherwise, the button is disabled
-                boolean buttonEnabled = IS_TURN && m_Model.GetBoardState().CountCapture(r_pos, c_pos, IS_BLACK) > 0;
-                m_ButtonArray[r_pos][c_pos].setEnabled(buttonEnabled);
+                boolean buttonEnabled = IS_TURN && m_Model.getBoardState().countCapture(r_pos, c_pos, IS_BLACK) > 0;
+                m_ButtonArray[r_pos][c_pos].setDisable(!buttonEnabled);
+
+                m_ButtonArray[r_pos][c_pos].update();
+            }
+        }
+    }
+
+    /**
+     * Override for Stage close method.
+     * Sets each button to empty, updates the view, and then
+     * calls Stage.close().
+     *
+     * @since 1.1
+     */
+    @Override
+    public void close() {
+        for (GridButton[] l : m_ButtonArray) {
+            for (GridButton g : l) {
+                g.setState(SpaceState.EMPTY);
             }
         }
 
-        m_Frame.repaint();
+        update();
+
+        super.close();
     }
 }

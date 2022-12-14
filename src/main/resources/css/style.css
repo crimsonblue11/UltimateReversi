@@ -1,0 +1,30 @@
+.start-pane {
+    -fx-background-color: blue;
+}
+
+.start-title {
+    -fx-text-fill: white;
+    -fx-font-family: Dyuthi;
+    -fx-font-size: 56px;
+}
+
+.start-button-large {
+    -fx-background-color: inherit;
+    -fx-border-color: black;
+    -fx-font-size: 24px;
+    -fx-label-padding: 12px;
+    -fx-text-fill: white;
+}
+
+.start-button-small {
+    -fx-background-color: inherit;
+    -fx-border-color: black;
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+}
+
+.start-selector-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
