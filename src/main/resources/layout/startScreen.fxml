@@ -9,7 +9,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0"
             prefWidth="600.0" styleClass="start-pane" xmlns="http://javafx.com/javafx/19"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.StartController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.reversi.StartController">
     <top>
         <Label styleClass="start-title" text="ULTIMATE REVERSI" BorderPane.alignment="CENTER"/>
     </top>

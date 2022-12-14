@@ -1,12 +1,12 @@
 /**
- * Class for drawing the window, game board, and everything else for each window.
- * Also handles some logic.
+ * Class for drawing the window, game board, and everything else for each player's window.
+ * Also handles some game logic.
  *
  * @author Medusa Dempsey
- * @version 1.0
+ * @version 1.1
  */
 
-package org.example;
+package org.example.reversi;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -19,6 +19,9 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class PlayerView extends Stage {
+    /**
+     * Model object reference.
+     */
     private final Model m_Model;
     /**
      * Array containing all spaces on the board, as drawn from this view.
@@ -36,8 +39,14 @@ public class PlayerView extends Stage {
      * Title of the screen of this view.
      */
     private Label m_Title;
-    final static int WIN_WIDTH = 600;
-    final static int WIN_HEIGHT = 700;
+    /**
+     * Constant representing width of the game window.
+     */
+    final static int WIN_WIDTH = 600; // todo : move to another class
+    /**
+     * Constant representing height of the game window.
+     */
+    final static int WIN_HEIGHT = 700; // todo : move to another class
 
     /**
      * Constructor method.
@@ -45,8 +54,8 @@ public class PlayerView extends Stage {
      * @param isBlack sets member variable isBlack
      */
     public PlayerView(boolean isBlack) {
-        m_Model = Model.GetSelf();
-        m_Model.StoreView(this);
+        m_Model = Model.getSelf();
+        m_Model.storeView(this);
 
         setTitle("Reversi");
 
@@ -57,9 +66,9 @@ public class PlayerView extends Stage {
     }
 
     /**
-     * Method for creating the GUI of this view.
+     * Method for creating this view's GUI.
      */
-    public void CreateGUI() {
+    public void createGUI() {
         setOnCloseRequest(e -> System.exit(0));
         setWidth(WIN_WIDTH);
         setHeight(WIN_HEIGHT);
@@ -73,7 +82,7 @@ public class PlayerView extends Stage {
             for (int c_pos = 0; c_pos < BoardState.GRID_SIZE; c_pos++) {
                 int r = IS_BLACK ? 7 - r_pos : r_pos;
                 int c = IS_BLACK ? 7 - c_pos : c_pos;
-                m_ButtonArray[r_pos][c_pos] = new GridButton(r_pos, c_pos, m_Model.GetBoardState().GetState(r, c));
+                m_ButtonArray[r_pos][c_pos] = new GridButton(r_pos, c_pos, m_Model.getBoardState().getState(r, c));
 
                 m_ButtonArray[r_pos][c_pos].setOnMouseClicked(e -> {
                     if (IS_TURN) {
@@ -107,7 +116,7 @@ public class PlayerView extends Stage {
 
         show();
 
-        Update();
+        update();
     }
 
     /**
@@ -117,13 +126,13 @@ public class PlayerView extends Stage {
      * @param b Button that has been clicked.
      */
     private void gridButtonAction(GridButton b) {
-        int row = b.GetRow();
-        int col = b.GetCol();
+        int row = b.getRow();
+        int col = b.getCol();
 
-        m_Model.GetBoardState().SetState(row, col, IS_BLACK);
-        m_Model.GetBoardState().CaptureCounters(row, col, IS_BLACK);
+        m_Model.getBoardState().setState(row, col, IS_BLACK);
+        m_Model.getBoardState().captureCounters(row, col, IS_BLACK);
 
-        m_Model.UpdateViews();
+        m_Model.updateViews();
     }
 
     /**
@@ -132,13 +141,13 @@ public class PlayerView extends Stage {
      */
     private void aiButtonAction() {
         GridButton highestButton = getHighestScoreSpace();
-        int row = highestButton.GetRow();
-        int col = highestButton.GetCol();
+        int row = highestButton.getRow();
+        int col = highestButton.getCol();
 
-        m_Model.GetBoardState().SetState(row, col, IS_BLACK);
-        m_Model.GetBoardState().CaptureCounters(row, col, IS_BLACK);
+        m_Model.getBoardState().setState(row, col, IS_BLACK);
+        m_Model.getBoardState().captureCounters(row, col, IS_BLACK);
 
-        m_Model.UpdateViews();
+        m_Model.updateViews();
     }
 
     /**
@@ -154,7 +163,7 @@ public class PlayerView extends Stage {
         for (int r_pos = 0; r_pos < 8; r_pos++) {
             for (int c_pos = 0; c_pos < 8; c_pos++) {
                 // get potential score from current space
-                int curr = m_Model.GetBoardState().CountCapture(r_pos, c_pos, IS_BLACK);
+                int curr = m_Model.getBoardState().countCapture(r_pos, c_pos, IS_BLACK);
 
                 // set the highest space to current, and highest potential score to current
                 if (curr > highest) {
@@ -170,7 +179,7 @@ public class PlayerView extends Stage {
     /**
      * Update method. Called every time a piece is played, for both views.
      */
-    public void Update() {
+    public void update() {
         String newTitle;
         if (IS_TURN) {
             IS_TURN = false;
@@ -183,35 +192,35 @@ public class PlayerView extends Stage {
 
         for (int r_pos = 0; r_pos < 8; r_pos++) {
             for (int c_pos = 0; c_pos < 8; c_pos++) {
-                // code for updating button array states depending on external state array
-                // again the black player's board must be accessed in reverse
                 int r_model = IS_BLACK ? 7 - r_pos : r_pos;
                 int c_model = IS_BLACK ? 7 - c_pos : c_pos;
 
-                m_ButtonArray[r_pos][c_pos].SetState(m_Model.GetBoardState().GetState(r_model, c_model));
+                m_ButtonArray[r_pos][c_pos].setState(m_Model.getBoardState().getState(r_model, c_model));
 
-                // space is enabled if it is the current view's turn, and the space will capture
-                // at least 1 opposing piece - otherwise, the button is disabled
-                boolean buttonEnabled = IS_TURN && m_Model.GetBoardState().CountCapture(r_pos, c_pos, IS_BLACK) > 0;
+                boolean buttonEnabled = IS_TURN && m_Model.getBoardState().countCapture(r_pos, c_pos, IS_BLACK) > 0;
                 m_ButtonArray[r_pos][c_pos].setDisable(!buttonEnabled);
 
-                m_ButtonArray[r_pos][c_pos].Update();
+                m_ButtonArray[r_pos][c_pos].update();
             }
         }
-
-//        m_Frame.repaint();
-        // might need jfx equivalent of this
     }
 
+    /**
+     * Override for Stage close method.
+     * Sets each button to empty, updates the view, and then
+     * calls Stage.close().
+     *
+     * @since 1.1
+     */
     @Override
     public void close() {
-        for(GridButton[] l : m_ButtonArray) {
-            for(GridButton g : l) {
-                g.SetState(SpaceState.EMPTY);
+        for (GridButton[] l : m_ButtonArray) {
+            for (GridButton g : l) {
+                g.setState(SpaceState.EMPTY);
             }
         }
 
-        Update();
+        update();
 
         super.close();
     }

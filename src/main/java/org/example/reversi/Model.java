@@ -3,9 +3,9 @@
  * Also, this class is a singleton.
  *
  * @author Medusa Dempsey
- * @version 1.0
+ * @version 1.1
  */
-package org.example;
+package org.example.reversi;
 
 import javafx.scene.control.Alert;
 
@@ -25,7 +25,12 @@ public class Model {
      */
     private final BoardState m_BoardState = new BoardState();
 
-    public BoardState GetBoardState() {
+    /**
+     * Accessor method for {@code m_BoardState}.
+     *
+     * @return BoardState object.
+     */
+    public BoardState getBoardState() {
         return m_BoardState;
     }
 
@@ -34,12 +39,12 @@ public class Model {
      *
      * @return Static instance.
      */
-    public static Model GetSelf() {
+    public static Model getSelf() {
         return m_Self;
     }
 
     /**
-     * Private constructor. Prevents external methods instantiating this class.
+     * Private constructor. Prevents external methods instantiating this singleton.
      */
     private Model() {
     }
@@ -49,7 +54,7 @@ public class Model {
      *
      * @param view View to add to the list of views.
      */
-    public void StoreView(PlayerView view) {
+    public void storeView(PlayerView view) {
         m_ViewArray.add(view);
     }
 
@@ -58,31 +63,39 @@ public class Model {
      * Also checks if the game is over via {@code BoardState.CheckGameOver}.
      * This is done here to ensure all views are updated accurately before the game ends.
      *
-     * @see BoardState#CheckGameOver()
+     * @see BoardState#checkGameOver()
      */
-    public void UpdateViews() {
+    public void updateViews() {
         for (PlayerView v : m_ViewArray) {
-            v.Update();
+            v.update();
         }
 
-        if (m_BoardState.CheckGameOver()) {
-            int whiteScore = m_BoardState.GetWhiteScore();
-            int blackScore = m_BoardState.GetBlackScore();
-
-            String winner_colour = (whiteScore > blackScore) ? "White" : "Black";
-
-            String outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
-
-            Alert winner_alert = new Alert(Alert.AlertType.INFORMATION, outDialog);
-            winner_alert.showAndWait();
-            StartStage.getInstance().show();
-
+        if (m_BoardState.checkGameOver()) {
             endGame();
         }
     }
 
+    /**
+     * Method to handle the game ending.
+     * Gets both player scores, calculates who won,
+     * displays this information in an alert window,
+     * closes game stages, and re-loads start stage.
+     *
+     * @since 1.1
+     */
     private void endGame() {
-        for(PlayerView v : m_ViewArray) {
+        int whiteScore = m_BoardState.getWhiteScore();
+        int blackScore = m_BoardState.getBlackScore();
+
+        String winner_colour = (whiteScore > blackScore) ? "White" : "Black";
+
+        String outDialog = winner_colour + " wins: " + whiteScore + " : " + blackScore;
+
+        Alert winner_alert = new Alert(Alert.AlertType.INFORMATION, outDialog);
+        winner_alert.showAndWait();
+        StartStage.getInstance().show();
+
+        for (PlayerView v : m_ViewArray) {
             v.close();
         }
 

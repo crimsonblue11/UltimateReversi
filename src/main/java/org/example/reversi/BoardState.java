@@ -2,9 +2,9 @@
  * Class to handle the state of the game board, independent of each view.
  *
  * @author Medusa Dempsey
- * @version 1.0
+ * @version 1.1
  */
-package org.example;
+package org.example.reversi;
 
 public class BoardState {
     static final int GRID_SIZE = 8;
@@ -29,18 +29,24 @@ public class BoardState {
      * @param col Column of the queried space.
      * @return Value of the queried space.
      */
-    public SpaceState GetState(int row, int col) {
+    public SpaceState getState(int row, int col) {
         if (row > 7 || col > 7 || row < 0 || col < 0) {
             return SpaceState.INVALID;
         }
         return m_BoardArray[row][col];
     }
 
-    public int GetBlackScore() {
+    /**
+     * Accessor method for black player's score.
+     */
+    public int getBlackScore() {
         return m_BlackStore;
     }
 
-    public int GetWhiteScore() {
+    /**
+     * Accessor method for white player's score.
+     */
+    public int getWhiteScore() {
         return m_WhiteScore;
     }
 
@@ -51,7 +57,7 @@ public class BoardState {
      * @param col     Column of the space to change.
      * @param isBlack Boolean representing the colour to change the space to - true if black, false if white.
      */
-    public void SetState(int row, int col, boolean isBlack) {
+    public void setState(int row, int col, boolean isBlack) {
         if (isBlack) {
             m_BoardArray[7 - row][7 - col] = SpaceState.BLACK;
         } else {
@@ -60,7 +66,10 @@ public class BoardState {
     }
 
     /**
-     * Constructor method to place initial counters on the board.
+     * Constructor method.
+     * Calls setBoard to set pieces to initial positions.
+     *
+     * @see #setBoard()
      */
     public BoardState() {
         setBoard();
@@ -75,7 +84,7 @@ public class BoardState {
      * @param col     The column of the counter that has been placed.
      * @param isBlack Boolean representing the colour of the placed piece - true if black, false if white.
      */
-    public void CaptureCounters(int row, int col, boolean isBlack) {
+    public void captureCounters(int row, int col, boolean isBlack) {
         // access spaces in reverse if black view, since upside-down
         if (isBlack) {
             row = 7 - row;
@@ -94,7 +103,7 @@ public class BoardState {
                 int r_pos = row + r_offset;
                 int c_pos = col + c_offset;
 
-                SpaceState currentSpace = GetState(r_pos, c_pos);
+                SpaceState currentSpace = getState(r_pos, c_pos);
 
                 SpaceState CURRENT_COLOUR = m_BoardArray[row][col];
                 SpaceState OPPOSITE_COLOUR = isBlack ? SpaceState.WHITE : SpaceState.BLACK;
@@ -104,7 +113,7 @@ public class BoardState {
 
                 int count = 1;
                 while (currentSpace == OPPOSITE_COLOUR) {
-                    currentSpace = GetState(r_pos += r_offset, c_pos += c_offset);
+                    currentSpace = getState(r_pos += r_offset, c_pos += c_offset);
                     count++;
                 }
 
@@ -132,7 +141,7 @@ public class BoardState {
      * @param isBlack Boolean representing which side the potential play is coming from - true if black, false if white.
      * @return Number of spaces that can be captured if the input move is played.
      */
-    public int CountCapture(int row, int col, boolean isBlack) {
+    public int countCapture(int row, int col, boolean isBlack) {
         // black inputs are reversed since the view is upside-down
         if (isBlack) {
             row = 7 - row;
@@ -143,7 +152,7 @@ public class BoardState {
         SpaceState OPPOSITE_COLOUR = isBlack ? SpaceState.WHITE : SpaceState.BLACK;
 
         // return zero for non-empty (unplayable) spaces
-        if (GetState(row, col) != SpaceState.EMPTY) {
+        if (getState(row, col) != SpaceState.EMPTY) {
             return 0;
         }
 
@@ -157,7 +166,7 @@ public class BoardState {
 
 
                 // if | offset | = 0 or space is invalid, skip to next one
-                if ((r_offset == 0 && c_offset == 0) || GetState(r_pos, c_pos) == SpaceState.INVALID) {
+                if ((r_offset == 0 && c_offset == 0) || getState(r_pos, c_pos) == SpaceState.INVALID) {
                     continue;
                 }
                 // if out of bounds, skip over it
@@ -169,7 +178,7 @@ public class BoardState {
                 while (currentCounter == OPPOSITE_COLOUR) {
                     r_pos += r_offset;
                     c_pos += c_offset;
-                    currentCounter = GetState(r_pos, c_pos);
+                    currentCounter = getState(r_pos, c_pos);
                     numChecked++;
                 }
 
@@ -190,7 +199,7 @@ public class BoardState {
      *
      * @return True if the game is over, false if otherwise.
      */
-    public boolean CheckGameOver() {
+    public boolean checkGameOver() {
         // local to the function, so they're reset if false is returned
         int blackScore = 0;
         int whiteScore = 0;
@@ -199,8 +208,8 @@ public class BoardState {
             for (int c_pos = 0; c_pos < 8; c_pos++) {
                 int playableSpaces = 0;
 
-                playableSpaces += CountCapture(r_pos, c_pos, false);
-                playableSpaces += CountCapture(r_pos, c_pos, true);
+                playableSpaces += countCapture(r_pos, c_pos, false);
+                playableSpaces += countCapture(r_pos, c_pos, true);
 
                 // game cannot be over, so return false and ignore all other spaces
                 if (playableSpaces != 0) {
@@ -222,9 +231,15 @@ public class BoardState {
         return true;
     }
 
+    /**
+     * Method to set the game board with initial piece positions.
+     * Called whenever the game is started.
+     *
+     * @since 1.1
+     */
     public void setBoard() {
-        for(int r = 0; r < GRID_SIZE; r++) {
-            for(int c = 0; c < GRID_SIZE; c++) {
+        for (int r = 0; r < GRID_SIZE; r++) {
+            for (int c = 0; c < GRID_SIZE; c++) {
                 m_BoardArray[r][c] = SpaceState.EMPTY;
             }
         }

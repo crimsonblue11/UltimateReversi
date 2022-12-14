@@ -2,74 +2,76 @@
  * Child class of JButton used as individual board squares.
  *
  * @author Medusa Dempsey
- * @version 1.0
+ * @version 1.1
  */
-package org.example;
+package org.example.reversi;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class GridButton extends Canvas {
+    /**
+     * Constant representing size of an individual grid space.
+     * Note that this is height and width, since the spaces are square.
+     * The value of this is {@value}.
+     */
     final static int SIZE = 75;
+    /**
+     * GraphicsContext object.
+     * Stored as constant for cleaner accessing.
+     */
     private final GraphicsContext GR = getGraphicsContext2D();
     /**
-     * Integer representing state of the grid space.
-     * 1 - black, 2 - white, 0 - empty.
+     * Enumerable representing state of the grid space.
+     * No value is set by default, since this is set in the constructor.
+     *
+     * @see SpaceState
      */
     private SpaceState m_State;
     /**
-     * Member variable representing row of the space.
+     * Member variable representing grid row of the space.
      */
     private final int m_Row;
     /**
-     * Member variable representing column of the space.
+     * Member variable representing grid column of the space.
      */
     private final int m_Col;
 
     /**
-     * Accessor method for space state.
-     *
-     * @return State of the space.
-     */
-    public SpaceState GetState() {
-        return m_State;
-    }
-
-    /**
      * Accessor method for the row of a space.
      *
-     * @return Row of the space.
+     * @return Value of {@code m_Row}.
      */
-    public int GetRow() {
+    public int getRow() {
         return m_Row;
     }
 
     /**
      * Accessor method for the column of a space.
      *
-     * @return Column of the space.
+     * @return Value of {@code m_Col}.
      */
-    public int GetCol() {
+    public int getCol() {
         return m_Col;
     }
 
     /**
      * Mutator method for the state of the space.
      *
-     * @param inState State to change the space to.
+     * @param inState Value to change {@code m_State} to.
      */
-    public void SetState(SpaceState inState) {
+    public void setState(SpaceState inState) {
         m_State = inState;
     }
 
     /**
-     * Constructor.
-     * Takes the column and row of the space, as well as its initial state.
+     * Constructor method.
+     * Sets initial values, as well as drawing in the grid's background.
      *
      * @param row     Row of the space.
      * @param col     Column of the space.
-     * @param inState Initial state of the space
+     * @param inState Initial state of the space.
      */
     public GridButton(int row, int col, SpaceState inState) {
         super(SIZE, SIZE);
@@ -78,16 +80,25 @@ public class GridButton extends Canvas {
         m_Row = row;
         m_Col = col;
 
+        drawSpace();
+    }
+
+    /**
+     * Method to draw background of the space.
+     * In other words, this method draws a green square over the entire canvas,
+     * and then a black border of width 2 around it.
+     *
+     * @since 1.1
+     */
+    private void drawSpace() {
         Color backgroundColor = Color.GREEN;
+
         GR.setFill(backgroundColor);
         GR.fillRect(0, 0, SIZE, SIZE);
 
-        drawBorder();
-    }
-
-    private void drawBorder() {
         Color borderColour = Color.BLACK;
         int borderThickness = 2;
+
         GR.setFill(borderColour);
         GR.setLineWidth(borderThickness);
         GR.strokeRect(0, 0, SIZE, SIZE);
@@ -95,28 +106,23 @@ public class GridButton extends Canvas {
     }
 
     /**
-     * Override of paintComponent method.
-     * Used to paint component with counter inside it, if needed. If the space is empty,
-     * then do nothing.
+     * Update method.
+     * This repaints the space's background over what was previously painted, so that if the state has changed
+     * there is no need to worry about it.
+     * Then, it checks if a counter needs to be painted at all - if yes, then it will be painted with the
+     * appropriate colour. Otherwise, nothing else happens.
      */
-    public void Update() {
+    public void update() {
         GR.setFill(Color.GREEN);
         GR.fillRect(0, 0, SIZE, SIZE);
-        drawBorder();
+        drawSpace();
 
         if (m_State == SpaceState.WHITE) {
-            // if white, paint a white circle with a black border (oval)
             GR.setFill(Color.WHITE);
             GR.fillOval(0, 0, getWidth(), getHeight());
-            GR.setFill(Color.BLACK);
-            GR.strokeOval(0, 0, getWidth(), getHeight());
         } else if (m_State == SpaceState.BLACK) {
-            // if black, paint a black circle with a white border (oval)
             GR.setFill(Color.BLACK);
             GR.fillOval(0, 0, getWidth(), getHeight());
-            GR.setFill(Color.WHITE);
-            GR.strokeOval(0, 0, getWidth(), getHeight());
         }
-        // if neither, the square is empty and nothing else needs to be done
     }
 }
