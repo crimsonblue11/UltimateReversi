@@ -162,15 +162,12 @@ public class BoardState {
         int finalCount = 0; // variable to keep track of how many pieces will be captured if played
         for (int r_offset = -1; r_offset <= 1; r_offset++) {
             for (int c_offset = -1; c_offset <= 1; c_offset++) {
-                System.out.println("entered");
-
                 int r_pos = row + r_offset;
                 int c_pos = col + c_offset;
 
 
                 // if | offset | = 0 or space is invalid, skip to next one
                 if ((r_offset == 0 && c_offset == 0) || GetState(r_pos, c_pos) == SpaceState.INVALID) {
-                    System.out.println("continued");
                     continue;
                 }
                 // if out of bounds, skip over it
@@ -193,7 +190,6 @@ public class BoardState {
             }
         }
 
-        System.out.println("returned " + finalCount);
         return finalCount;
     }
 

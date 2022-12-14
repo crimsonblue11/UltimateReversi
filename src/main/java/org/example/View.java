@@ -8,26 +8,24 @@
 
 package org.example;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
+import javafx.scene.Scene;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-public class View {
+public class View extends Stage {
+    private Scene m_Scene;
     private final Model m_Model;
     /**
      * Array containing all spaces on the board, as drawn from this view.
      */
     private final GridButton[][] m_ButtonArray = new GridButton[8][8];
-    /**
-     * JFrame containing the view.
-     */
-    private final JFrame m_Frame = new JFrame();
     /**
      * Boolean representing the colour of this view's player - true if black, false if white.
      */
@@ -39,7 +37,7 @@ public class View {
     /**
      * Title of the screen of this view.
      */
-    private JLabel m_Title;
+    private Label m_Title;
     final static int WIN_WIDTH = 600;
     final static int WIN_HEIGHT = 700;
 
@@ -52,7 +50,7 @@ public class View {
         m_Model = Model.GetSelf();
         m_Model.StoreView(this);
 
-        m_Frame.setTitle("Reversi");
+        setTitle("Reversi");
 
         // when update is called, the current turn will switch
         // white goes first, so when initialised the roles must be switched
@@ -64,12 +62,14 @@ public class View {
      * Method for creating the GUI of this view.
      */
     public void CreateGUI() {
-        m_Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        m_Frame.setLayout(new BorderLayout());
-        m_Frame.setPreferredSize(new Dimension(WIN_WIDTH, WIN_HEIGHT));
+        setOnCloseRequest(e -> System.exit(0));
+        setWidth(WIN_WIDTH);
+        setHeight(WIN_HEIGHT);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(BoardState.GRID_SIZE, BoardState.GRID_SIZE));
+        BorderPane root = new BorderPane();
+
+        GridPane grid = new GridPane();
+        root.setCenter(grid);
 
         for (int r_pos = 0; r_pos < BoardState.GRID_SIZE; r_pos++) {
             for (int c_pos = 0; c_pos < BoardState.GRID_SIZE; c_pos++) {
@@ -77,36 +77,37 @@ public class View {
                 int c = IS_BLACK ? 7 - c_pos : c_pos;
                 m_ButtonArray[r_pos][c_pos] = new GridButton(r_pos, c_pos, m_Model.GetBoardState().GetState(r, c));
 
-                m_ButtonArray[r_pos][c_pos].addActionListener(e -> {
+                m_ButtonArray[r_pos][c_pos].setOnMouseClicked(e -> {
                     if (IS_TURN) {
                         gridButtonAction((GridButton) e.getSource());
                     }
                 });
 
-                panel.add(m_ButtonArray[r_pos][c_pos]);
+                grid.add(m_ButtonArray[r_pos][c_pos], r_pos, c_pos);
             }
         }
 
         // code for greedy AI button
-        JButton button = new JButton("Make greedy AI move");
-        button.setFont(new Font("Ariel", Font.BOLD, 20));
+        Button aiButton = new Button("Make greedy AI move");
+        aiButton.setFont(Font.font("Ariel", FontWeight.BOLD, FontPosture.REGULAR, 20));
 
-        button.addActionListener(e -> {
+        aiButton.setOnMouseClicked(e -> {
             if (IS_TURN) {
                 aiButtonAction();
             }
         });
 
         String player_colour = IS_BLACK ? "Black" : "White";
-        m_Title = new JLabel(player_colour + " player");
+        m_Title = new Label(player_colour + " player");
 
-        // add everything to the panel
-        m_Frame.add(panel, BorderLayout.CENTER);
-        m_Frame.add(button, BorderLayout.SOUTH);
-        m_Frame.add(m_Title, BorderLayout.NORTH);
+        root.setCenter(grid);
+        root.setBottom(aiButton);
+        root.setTop(m_Title);
 
-        m_Frame.pack();
-        m_Frame.setVisible(true);
+        m_Scene = new Scene(root);
+        setScene(m_Scene);
+
+        show();
 
         Update();
     }
@@ -194,10 +195,13 @@ public class View {
                 // space is enabled if it is the current view's turn, and the space will capture
                 // at least 1 opposing piece - otherwise, the button is disabled
                 boolean buttonEnabled = IS_TURN && m_Model.GetBoardState().CountCapture(r_pos, c_pos, IS_BLACK) > 0;
-                m_ButtonArray[r_pos][c_pos].setEnabled(buttonEnabled);
+                m_ButtonArray[r_pos][c_pos].setDisable(!buttonEnabled);
+
+                m_ButtonArray[r_pos][c_pos].Update();
             }
         }
 
-        m_Frame.repaint();
+//        m_Frame.repaint();
+        // might need jfx equivalent of this
     }
 }

@@ -6,14 +6,13 @@
  */
 package org.example;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-
-
-public class GridButton extends JButton {
+public class GridButton extends Canvas {
+    final static int SIZE = 75;
+    private final GraphicsContext GR = getGraphicsContext2D();
     /**
      * Integer representing state of the grid space.
      * 1 - black, 2 - white, 0 - empty.
@@ -73,40 +72,50 @@ public class GridButton extends JButton {
      * @param inState Initial state of the space
      */
     public GridButton(int row, int col, SpaceState inState) {
+        super(SIZE, SIZE);
+
         m_State = inState;
         m_Row = row;
         m_Col = col;
 
-        Color backgroundColor = Color.green;
-        setBackground(backgroundColor);
+        Color backgroundColor = Color.GREEN;
+        GR.setFill(backgroundColor);
+        GR.fillRect(0, 0, SIZE, SIZE);
 
-        Color borderColour = Color.black;
+        drawBorder();
+    }
+
+    private void drawBorder() {
+        Color borderColour = Color.BLACK;
         int borderThickness = 2;
-        setBorder(BorderFactory.createLineBorder(borderColour, borderThickness));
+        GR.setFill(borderColour);
+        GR.setLineWidth(borderThickness);
+        GR.strokeRect(0, 0, SIZE, SIZE);
+        GR.setLineWidth(1);
     }
 
     /**
      * Override of paintComponent method.
      * Used to paint component with counter inside it, if needed. If the space is empty,
      * then do nothing.
-     *
-     * @param g Graphics object to draw the button to.
      */
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public void Update() {
+        GR.setFill(Color.GREEN);
+        GR.fillRect(0, 0, SIZE, SIZE);
+        drawBorder();
+
         if (m_State == SpaceState.WHITE) {
             // if white, paint a white circle with a black border (oval)
-            g.setColor(Color.white);
-            g.fillOval(0, 0, getSize().width, getSize().height);
-            g.setColor(Color.black);
-            g.drawOval(0, 0, getSize().width, getSize().height);
+            GR.setFill(Color.WHITE);
+            GR.fillOval(0, 0, getWidth(), getHeight());
+            GR.setFill(Color.BLACK);
+            GR.strokeOval(0, 0, getWidth(), getHeight());
         } else if (m_State == SpaceState.BLACK) {
             // if black, paint a black circle with a white border (oval)
-            g.setColor(Color.black);
-            g.fillOval(0, 0, getSize().width, getSize().height);
-            g.setColor(Color.white);
-            g.drawOval(0, 0, getSize().width, getSize().height);
+            GR.setFill(Color.BLACK);
+            GR.fillOval(0, 0, getWidth(), getHeight());
+            GR.setFill(Color.WHITE);
+            GR.strokeOval(0, 0, getWidth(), getHeight());
         }
         // if neither, the square is empty and nothing else needs to be done
     }
